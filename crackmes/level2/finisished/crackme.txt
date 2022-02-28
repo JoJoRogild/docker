@@ -1,0 +1,115 @@
+┌ 96: int main (uint32_t argc, char **argv);
+│           ; var char **var_10h @ rbp-0x10
+│           ; var uint32_t var_4h @ rbp-0x4
+│           ; arg uint32_t argc @ rdi
+│           ; arg char **argv @ rsi
+│           0x00001205      55             push rbp
+│           0x00001206      4889e5         mov rbp, rsp
+│           0x00001209      4883ec10       sub rsp, 0x10
+│           0x0000120d      897dfc         mov dword [var_4h], edi     ; argc
+│           0x00001210      488975f0       mov qword [var_10h], rsi    ; argv
+│           0x00001214      837dfc01       cmp dword [var_4h], 1
+│       ┌─< 0x00001218      7408           je 0x1222
+│       │   0x0000121a      837dfc02       cmp dword [var_4h], 2
+│      ┌──< 0x0000121e      741f           je 0x123f
+│     ┌───< 0x00001220      eb3c           jmp 0x125e
+│     │││   ; CODE XREF from main @ 0x1218
+│     ││└─> 0x00001222      488b45f0       mov rax, qword [var_10h]
+│     ││    0x00001226      488b00         mov rax, qword [rax]
+│     ││    0x00001229      4889c6         mov rsi, rax
+│     ││    0x0000122c      488d3d360e00.  lea rdi, qword str.Usage:__s__password ; 0x2069 ; "Usage: %s <password>" ; const char *format
+│     ││    0x00001233      b800000000     mov eax, 0
+│     ││    0x00001238      e813feffff     call sym.imp.printf         ; int printf(const char *format)
+│     ││┌─< 0x0000123d      eb1f           jmp 0x125e
+│     │││   ; CODE XREF from main @ 0x121e
+│     │└──> 0x0000123f      488d3d380e00.  lea rdi, qword str.Checking_password.. ; 0x207e ; "Checking password.." ; const char *s
+│     │ │   0x00001246      e8e5fdffff     call sym.imp.puts           ; int puts(const char *s)
+│     │ │   0x0000124b      488b45f0       mov rax, qword [var_10h]
+│     │ │   0x0000124f      4883c008       add rax, 8
+│     │ │   0x00001253      488b00         mov rax, qword [rax]
+│     │ │   0x00001256      4889c7         mov rdi, rax                ; int64_t arg1
+│     │ │   0x00001259      e8f7feffff     call sym.check_password
+│     │ │   ; CODE XREFS from main @ 0x1220, 0x123d
+│     └─└─> 0x0000125e      b800000000     mov eax, 0
+│           0x00001263      c9             leave
+└           0x00001264      c3             ret
+the above code calls sym.check_password and rdi and rax = password
+
+
+
+
+
+
+┌ 177: sym.stringCompare (int64_t arg1, int64_t arg2);
+│           ; var int64_t var_20h @ rbp-0x20
+│           ; var int64_t var_18h @ rbp-0x18
+│           ; var uint32_t var_8h @ rbp-0x8
+│           ; var int64_t var_4h @ rbp-0x4
+│           ; arg int64_t arg1 @ rdi
+│           ; arg int64_t arg2 @ rsi
+│           0x00001265      55             push rbp
+│           0x00001266      4889e5         mov rbp, rsp
+│           0x00001269      48897de8       mov qword [var_18h], rdi    ; arg1
+│           0x0000126d      488975e0       mov qword [var_20h], rsi    ; arg2
+│           0x00001271      c745fc000000.  mov dword [var_4h], 0
+│           0x00001278      c745f8000000.  mov dword [var_8h], 0
+│       ┌─< 0x0000127f      eb31           jmp 0x12b2
+│       │   ; CODE XREF from sym.stringCompare @ 0x12d8
+│      ┌──> 0x00001281      8b45fc         mov eax, dword [var_4h]
+│      ╎│   0x00001284      4863d0         movsxd rdx, eax
+│      ╎│   0x00001287      488b45e8       mov rax, qword [var_18h]
+│      ╎│   0x0000128b      4801d0         add rax, rdx
+│      ╎│   0x0000128e      0fb610         movzx edx, byte [rax]
+│      ╎│   0x00001291      8b45fc         mov eax, dword [var_4h]
+│      ╎│   0x00001294      4863c8         movsxd rcx, eax
+│      ╎│   0x00001297      488b45e0       mov rax, qword [var_20h]
+│      ╎│   0x0000129b      4801c8         add rax, rcx
+│      ╎│   0x0000129e      0fb600         movzx eax, byte [rax]
+│      ╎│   0x000012a1      38c2           cmp dl, al
+│     ┌───< 0x000012a3      7409           je 0x12ae
+│     │╎│   0x000012a5      c745f8010000.  mov dword [var_8h], 1
+│    ┌────< 0x000012ac      eb2c           jmp 0x12da
+│    ││╎│   ; CODE XREF from sym.stringCompare @ 0x12a3
+│    │└───> 0x000012ae      8345fc01       add dword [var_4h], 1
+│    │ ╎│   ; CODE XREF from sym.stringCompare @ 0x127f
+│    │ ╎└─> 0x000012b2      8b45fc         mov eax, dword [var_4h]
+│    │ ╎    0x000012b5      4863d0         movsxd rdx, eax
+│    │ ╎    0x000012b8      488b45e8       mov rax, qword [var_18h]
+│    │ ╎    0x000012bc      4801d0         add rax, rdx
+│    │ ╎    0x000012bf      0fb600         movzx eax, byte [rax]
+│    │ ╎    0x000012c2      84c0           test al, al
+│    │ ╎┌─< 0x000012c4      7414           je 0x12da
+│    │ ╎│   0x000012c6      8b45fc         mov eax, dword [var_4h]
+│    │ ╎│   0x000012c9      4863d0         movsxd rdx, eax
+│    │ ╎│   0x000012cc      488b45e0       mov rax, qword [var_20h]
+│    │ ╎│   0x000012d0      4801d0         add rax, rdx
+│    │ ╎│   0x000012d3      0fb600         movzx eax, byte [rax]
+│    │ ╎│   0x000012d6      84c0           test al, al
+│    │ └──< 0x000012d8      75a7           jne 0x1281
+│    │  │   ; CODE XREFS from sym.stringCompare @ 0x12ac, 0x12c4
+│    └──└─> 0x000012da      837df800       cmp dword [var_8h], 0
+│       ┌─< 0x000012de      752f           jne 0x130f
+│       │   0x000012e0      8b45fc         mov eax, dword [var_4h]
+│       │   0x000012e3      4863d0         movsxd rdx, eax
+│       │   0x000012e6      488b45e8       mov rax, qword [var_18h]
+│       │   0x000012ea      4801d0         add rax, rdx
+│       │   0x000012ed      0fb600         movzx eax, byte [rax]
+│       │   0x000012f0      84c0           test al, al
+│      ┌──< 0x000012f2      751b           jne 0x130f
+│      ││   0x000012f4      8b45fc         mov eax, dword [var_4h]
+│      ││   0x000012f7      4863d0         movsxd rdx, eax
+│      ││   0x000012fa      488b45e0       mov rax, qword [var_20h]
+│      ││   0x000012fe      4801d0         add rax, rdx
+│      ││   0x00001301      0fb600         movzx eax, byte [rax]
+│      ││   0x00001304      84c0           test al, al
+│     ┌───< 0x00001306      7507           jne 0x130f
+│     │││   0x00001308      b801000000     mov eax, 1
+│    ┌────< 0x0000130d      eb05           jmp 0x1314
+│    ││││   ; CODE XREFS from sym.stringCompare @ 0x12de, 0x12f2, 0x1306
+│    │└└└─> 0x0000130f      b800000000     mov eax, 0
+│    │      ; CODE XREF from sym.stringCompare @ 0x130d
+│    └────> 0x00001314      5d             pop rbp
+└           0x00001315      c3             ret
+
+
+password = super_secret_pass_56178

@@ -1,0 +1,66 @@
+┌ 114: sym.check_pass (uint32_t arg1, char *arg2);                                                                                                                                                         
+│           ; var char *str @ rbp-0x20                                                                                                                                                                     
+│           ; var uint32_t var_14h @ rbp-0x14                                                                                                                                                              
+│           ; var size_t var_8h @ rbp-0x8                                                                                                                                                                  
+│           ; var int64_t var_4h @ rbp-0x4                                                                                                                                                                 
+│           ; arg uint32_t arg1 @ rdi                                                                                                                                                                      
+│           ; arg char *arg2 @ rsi                                                                                                                                                                         
+│           0x000007f5      55             push rbp                                                                                                                                                        
+│           0x000007f6      4889e5         mov rbp, rsp                                                                                                                                                    
+│           0x000007f9      4883ec20       sub rsp, 0x20                                                                                                                                                   
+│           0x000007fd      897dec         mov dword [var_14h], edi    ; arg1                                                                                                                              
+│           0x00000800      488975e0       mov qword [str], rsi        ; arg2   
+
+str har input
+
+│           0x00000804      837dec02       cmp dword [var_14h], 2                                                                                                                                          
+│       ┌─< 0x00000808      7556           jne 0x860                                                                                                                                                       
+│       │   0x0000080a      488b45e0       mov rax, qword [str]                                                                                                                                            
+│       │   0x0000080e      4889c7         mov rdi, rax                ; const char *s                                                                                                                     
+│       │   0x00000811      e81afeffff     call sym.imp.strlen         ;[1] ; size_t strlen(const char *s)                                                                                                 
+│       │   0x00000816      8945f8         mov dword [var_8h], eax                                                                                                                                         
+│       │   0x00000819      488b45e0       mov rax, qword [str]                                                                                                                                            
+│       │   0x0000081d      4889c7         mov rdi, rax                ; const char *str                                                                                                                   
+│       │   0x00000820      e82bfeffff     call sym.imp.atoi           ;[2] ; int atoi(const char *str)   
+
+atoi hentyder nok at man skal give det nogle tal
+
+│       │   0x00000825      8945fc         mov dword [var_4h], eax                                                                                                                                         
+│       │   0x00000828      8b4df8         mov ecx, dword [var_8h]   
+
+var_4h er det tal som man giver og var_8h er hvor mange cifrer tallet er
+
+│       │   0x0000082b      ba56555555     mov edx, 0x55555556         ; 'VUUU'                                                                                                                            
+│       │   0x00000830      89c8           mov eax, ecx                                                                                                                                                    
+│       │   0x00000832      f7ea           imul edx                                                                                                                                                        
+│       │   0x00000834      89c8           mov eax, ecx                                                                                                                                                    
+│       │   0x00000836      c1f81f         sar eax, 0x1f                                                                                                                                                   
+│       │   0x00000839      29c2           sub edx, eax                                                                                                                                                    
+│       │   0x0000083b      89d0           mov eax, edx                                                                                                                                                    
+│       │   0x0000083d      89c2           mov edx, eax                                                                                                                                                    
+│       │   0x0000083f      01d2           add edx, edx                                                                                                                                                    
+│       │   0x00000841      01c2           add edx, eax                                                                                                                                                    
+│       │   0x00000843      89c8           mov eax, ecx                                                                                                                                                    
+│       │   0x00000845      29d0           sub eax, edx                                                                                                                                                    
+│       │   0x00000847      85c0           test eax, eax        
+
+så der er noget matematik jeg skal regne ud her og så skal tallet være et primtal
+jeg tror bare koden over her checker om tallet er 3 cifrer
+
+
+│      ┌──< 0x00000849      7515           jne 0x860                                                                                                                                                       
+│      ││   0x0000084b      8b45fc         mov eax, dword [var_4h]                                                                                                                                         
+│      ││   0x0000084e      89c7           mov edi, eax                                                                                                                                                    
+│      ││   0x00000850      e812000000     call sym.is_prime           ;[3]                                                                                                                                
+│      ││   0x00000855      85c0           test eax, eax                                                                                                                                                   
+│     ┌───< 0x00000857      7407           je 0x860                                                                                                                                                        
+│     │││   0x00000859      b801000000     mov eax, 1                                                                                                                                                      
+│    ┌────< 0x0000085e      eb05           jmp 0x865                                                                                                                                                       
+│    ││││   ; CODE XREFS from sym.check_pass @ 0x808, 0x849, 0x857                                                                                                                                         
+│    │└└└─> 0x00000860      b800000000     mov eax, 0                                                                                                                                                      
+│    │      ; CODE XREF from sym.check_pass @ 0x85e                                                                                                                                                        
+│    └────> 0x00000865      c9             leave                                                                                                                                                           
+└           0x00000866      c3             ret
+
+
+passworded er 101

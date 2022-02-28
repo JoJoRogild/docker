@@ -1,0 +1,263 @@
+this is the function that writes one char into memory i think
+de 2 argumenter er at
+rdi = pointer til .text string
+rsi = char
+den skriver det ikke ind i memory fordi den overskriver det vær gang
+
+            0x00004c64      fa             cli                                                                                                                                                             
+            0x00004c65      55             push rbp                                                                                                                                                        
+            0x00004c66      4889e5         mov rbp, rsp                                                                                                                                                    
+            0x00004c69      4883ec10       sub rsp, 0x10                                                                                                                                                   
+            0x00004c6d      48897df8       mov qword [rbp - 8], rdi 
+
+[rbp - 8] = *".text"
+
+            0x00004c71      89f0           mov eax, esi                                                                                                                                                    
+            0x00004c73      8845f4         mov byte [rbp - 0xc], al
+
+ [rbp - 0xc] = char
+
+            0x00004c76      488b45f8       mov rax, qword [rbp - 8]                                                                                                                                        
+            0x00004c7a      8b5020         mov edx, dword [rax + 0x20]                                                                                                                                     
+            0x00004c7d      488b45f8       mov rax, qword [rbp - 8]                                                                                                                                        
+            0x00004c81      8b4010         mov eax, dword [rax + 0x10]                                                                                                                                     
+            
+edx = [*".text" + 0x20]
+rax = [*".text" + 0x10]
+
+            0x00004c84      39c2           cmp edx, eax         
+
+if (edx < eax):
+det der cmp er for at se om i er under 0x1000 hvis det er skal man springe hopped over
+        ┌─< 0x00004c86      7221           jb 0x4ca9                                                                                                                                                       
+        │   0x00004c88      488b45f8       mov rax, qword [rbp - 8]                                                                                                                                        
+        │   0x00004c8c      8b5014         mov edx, dword [rax + 0x14]                                                                                                                                     
+        │   0x00004c8f      488b45f8       mov rax, qword [rbp - 8]                                                                                                                                        
+        │   0x00004c93      8b4020         mov eax, dword [rax + 0x20]                                                                                                                                     
+        │   0x00004c96      01c2           add edx, eax                                                                                                                                                    
+        │   0x00004c98      488b45f8       mov rax, qword [rbp - 8]                                                                                                                                        
+        │   0x00004c9c      4889c6         mov rsi, rax                                                                                                                                                    
+        │   0x00004c9f      bf03000000     mov edi, 3                                                                                                                                                      
+        │   0x00004ca4      e813180000     call 0x64bc                 ;[1]                                                                                                                                
+        │   ; CODE XREF from main @ +0x369d                        
+
+
+        └─> 0x00004ca9      488b45f8       mov rax, qword [rbp - 8]
+            0x00004cad      488b5008       mov rdx, qword [rax + 8]                                                                                                                                        
+            0x00004cb1      488b45f8       mov rax, qword [rbp - 8]                                                                                                                                        
+            0x00004cb5      8b4020         mov eax, dword [rax + 0x20]                                                                                                                                     
+            0x00004cb8      89c0           mov eax, eax                                                                                                                                                    
+            0x00004cba      4801c2         add rdx, rax 
+
+rdx = [ rax + 8]
+rdx += [*".text" + 0x20]
+eax = char
+
+            0x00004cbd      0fb645f4       movzx eax, byte [rbp - 0xc]                                                                                                                                     
+            0x00004cc1      8802           mov byte [rdx], al                                                                                                                                             
+der er også et write her det må være her det intersante sker
+yeah det er lige her man skriver det ind i memory nu skal jeg bare finde ud af hvad rdx er
+rdx er:
+[*".text" + 8] + [*".text" + 0x20]
+så man skriver alt ind i memory lige her:
+[[*".text" + 8] + [*".text" + 0x20]] = char
+og det er det samme som
+[[rdi + 8] + [rdi + 0x20]]
+som i function udenfor er lig med
+( { [rbp - 0x10] + 8} + { [rbp - 0x10] + 0x20 } ) = char
+og så noget i det
+
+
+            0x00004cc3      488b45f8       mov rax, qword [rbp - 8]                                                                                                                                        
+            0x00004cc7      8b4020         mov eax, dword [rax + 0x20]                                                                                                                                     
+            0x00004cca      8d5001         lea edx, dword [rax + 1]                                                                                                                                        
+            0x00004ccd      488b45f8       mov rax, qword [rbp - 8]                                                                                                                                        
+            0x00004cd1      895020         mov dword [rax + 0x20], edx                                                                                                                                     
+ok så det eneste man faktiskt skriver er den linje lige over her
+man skriver bare i ned
+
+            0x00004cd4      b801000000     mov eax, 1                                                                                                                                                      
+            0x00004cd9      c9             leave                                                                                                                                                           
+            0x00004cda      c3             ret
+
+
+så ( { [rbp - 0x10] + 8} + { [rbp - 0x10] + 0x20 } ) = de første 0x1000 bytes
+og hvis man rammer det der loop dør du med seg fault så det er ligemeget
+
+( [0x55656f097618] + [0x55656f097630]) = data
+og shit nummer 2 er bare offset så
+([rbp - 0x10] + 8) = *data
+så den jeg arbejder med loade alt dataen(0x2c07 bytes) ind i 0x55656f097670
+                                                             0x563c868c2670
+den læse åben bart engang til
+det gør den 0xe gange aka 14 gange
+efter det laver den nogle checks og så leaver den
+og function efter den ved jeg ikke hvad laver men så function efter kommer der hvor man læser password og checker ting
+
+switch statementen har 2 args
+rdi = et tomt sted jeg tror der kommer noget output der
+rsi = en masse addreser men {([rsi + 0x10]) + 8} = data
+den der 0x133700 var ting er ligesom et i tror jeg
+
+første call i switch casen giver en byte til der de er kommet til så dvs 06 i første
+og den næste function er den samme men hvor de har ændred I så man får byte 2 dvs 02
+nummer 2 byte er en mode byte jeg ved ikke hvad det er
+der er vist 3 modes 0 1 2 måske nogle over 3
+
+
+0x563c8501013f - 0x563c85010041 = FE
+0x00002041 + 0xfe = 213f aka case 6 og første byte er 06 så det er første skridt at det er et case nummer
+med første case er der gået 43 bytes og inden casen var der gået 6 bytes 
+jeg skal finde ud af hvad nummer 3 function gør i switch function
+og så den første byte bestemmer hvilken case og nummer 2 byte bestemmer hvilken "mode" det er så jeg skal finde ud af hvad de forskellige modes gør jeg starter med nummer 2
+
+
+2: ok den function der finder ud af moden har 4 agumenter
+rdi: den der tomme heap addrese tror jeg med Q 0x8 bytes tilbage
+rsi: pointer til pointer bla blah blah den der peger på alle bytesne
+rcx = stack pointer
+rdx = mode byte
+så hopper den til 2 i if statementen fordi mode er 2
+starten af 2 ser sådan her ud
+        │0x561fb11e7c15      488b45d8       mov rax, qword [rbp - 0x28]                                                                                                                                 
+        │0x561fb11e7c19      8b4834         mov ecx, dword [rax + 0x34]                                                                                                                                 
+        │0x561fb11e7c1c      488b45d0       mov rax, qword [rbp - 0x30]                                                                                                                                 
+        │0x561fb11e7c20      488b4010       mov rax, qword [rax + 0x10]                                                                                                                                 
+        │0x561fb11e7c24      ba04000000     mov edx, 4                                                                                                                                                  
+        │0x561fb11e7c29      89ce           mov esi, ecx                                                                                                                                                
+        │0x561fb11e7c2b      4889c7         mov rdi, rax                                                                                                                                                
+        │0x561fb11e7c2e      e8762c0000     call 0x561fb11ea8a9     ;[1]                                                                                                                                
+        │0x561fb11e7c33      488b55c0       mov rdx, qword [rbp - 0x40]                                                                                                                                 
+        │0x561fb11e7c37      488902         mov qword [rdx], rax                                                                                                                                        
+        │0x561fb11e7c3a      488b45d8       mov rax, qword [rbp - 0x28]                                                                                                                                 
+        │0x561fb11e7c3e      8b4034         mov eax, dword [rax + 0x34]                                                                                                                                 
+        │0x561fb11e7c41      8d5004         lea edx, dword [rax + 4]                                                                                                                                    
+        │0x561fb11e7c44      488b45d8       mov rax, qword [rbp - 0x28]                                                                                                                                 
+        │0x561fb11e7c48      895034         mov dword [rax + 0x34], edx                                                                                                                                 
+        │0x561fb11e7c4b      8345ec04       add dword [rbp - 0x14], 4 
+rbp - 0x28 = rdi 
+rbp - 0x30 = rsi
+[rdi+0x34] = i hvor man kommet til i bytes aka I
+rax = pointer til pointer til bytes
+så skal jeg bare finde ud af hvad den function gør 
+den returner en pointer til der hvor man er noget til så det skriver jeg function listen
+så gemmer man værdien der på stacken
+rax = I
+rcx = I + 4
+har man læst 4 bytes i den function? det bliver jeg jo nød til at finde ud af 
+og så hopper man ned til en til mode check ting men alle modes hopper derned
+den læser ikke nogle bytes den returner bare pointer men hvd man edx aka arg3 gør får det er jo 4? jeg bliver nød til at køre den igen
+yeah den læser ikke noget man bruger kun den der 4 i en and statement
+det er det der sker ikke mere den return 0x6
+den returner 0x7 selv når jeg ændred byten til 0x7 så jeg ved ikke hvad det er for noget men så er det måske ikke den første byte der bestemmer case
+jo det er stadig den byte der bestemmer case
+man returner [rbp - 0x14] som i starten af den her func er lig med 0x2 og man pluser den med 4 så man ret altid 0x6 hvis mode = 2
+men man returner også en addresse på stacken med hvor man er noget til eller ikke returner men man skriver hvilken byte den er noget til et sted i stacken
+
+
+
+oh shit i case 6 mode 2 er den første byte 0x6 som er case 6 nummer 2 er 0x2 som er mode 2 og efter 43 som skipper 43 bytes
+
+ok strategy:
+jeg skal finde den instruction der får input og få en masse info og bagefter finde den der printer wrong
+jeg sætter breakpoint lige efter functionen 
+og det kan man ikke jeg bliver nød til at finde den case og sætte breakpoint der jeg tror ikke jeg når længere med at disassemble modesne
+case 7 kan måske gøre det
+case 7 er den eneste der sker noget intersant i
+jeg tror det er case 7 alle prints og reads sker i 
+
+første case 7 printf("Enter Password:")
+andet  case 7 read()
+trejde case 7 printf("Wrong Password")
+så er der hvist en fjerde med en printf("\n")
+
+
+i second case 7 er det case 0 i functionen man bruger
+man kan ikke tælle fordi der er så mange 
+jeg tror jeg bliver nød til at reverse hele vm'en
+
+
+
+function liste:
+0xXXXXXa9 = returner pointer til der hvor du er noget til
+0xXXXXX48 = læser er byte der hvor du er noget til
+0xXXXXX3d = noget med mode
+0xXXXXX62 i static og 0x5e i debug= switch statement nej den ændrer sig
+0xXXXXX65 = jeg tror bare man læser en til pointer
+0xXXXXXbc = seg fault så den er ligegyldig
+0xXXXXXE0 = Seg fault hvis pointer til bytes er 00
+
+
+de var man sætter til nul før casene er åbenbart ikke nul
+de bliver ændred af nederste function før cases
+reverse vm
+4 : den er ligegyldig fordi den er efter
+3 : den er ogs ligegyldig
+2 : er ligegyldig
+24: er ligegyldig
+26: er ligegyldig
+telefon:
+27: er ligegyldig
+29: er ligegyldig
+30: er ligegyldig
+31: er ligegyldig
+32: er ligegyldig
+
+33: er ligegyldig
+11: er ligegyldig
+12: er ligegyldig
+14: er ligegyldig
+15: er ligegyldig
+17: er ligegyldig
+18: er ligegyldig
+20: er ligegyldig
+21: er ligegyldig
+36: er ligegyldig
+40: er ligegyldig
+41: er ligegyldig
+46: er ligegyldig
+47: er ligegyldig
+49: er ligegyldig
+kommet til 49
+
+7 : er lidt svær så jeg venter
+0 :
+8 : meget vigtig fordi den er ikke før input men før wrongPass
+9 : meget vigtig fordi den er ikke før input men før wrongPass
+23: meget vigtig fordi den er ikke før input men før wrongpass
+25: meget vigtig fordi den er ikke før input men før wrongpass
+28: samme som de andre
+16: meget vigtig
+19: meget vigtig
+39: meget vigtig
+43: meget vigtig
+48: meget vigtig
+
+så dem jeg skal reverse er 
+0
+1
+5
+6
+7
+8
+9
+10
+13
+16
+19
+22
+23
+25
+28
+34
+35
+37
+38
+39
+42
+43
+44
+45
+48
+default
+

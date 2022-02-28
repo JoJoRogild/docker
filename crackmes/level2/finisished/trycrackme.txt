@@ -1,0 +1,108 @@
+┌ 381: int main (int argc, char **argv);
+│           ; var char **var_e0h @ rbp-0xe0
+│           ; var int64_t var_d4h @ rbp-0xd4
+│           ; var int64_t var_c8h @ rbp-0xc8
+│           ; var int64_t var_c4h @ rbp-0xc4
+│           ; var size_t 0xAVar @ rbp-0xc0
+│           ; var char *s @ rbp-0xbb
+│           ; var int64_t var_b3h @ rbp-0xb3
+│           ; var int64_t var_b1h @ rbp-0xb1
+│           ; var char *s1 @ rbp-0xb0
+│           ; var char *s2 @ rbp-0x70
+│           ; var int64_t canary @ rbp-0x8
+│           ; arg int argc @ rdi
+│           ; arg char **argv @ rsi
+│           0x000011af      55             push rbp
+│           0x000011b0      4889e5         mov rbp, rsp
+│           0x000011b3      4881ece00000.  sub rsp, 0xe0
+│           0x000011ba      89bd2cffffff   mov dword [var_d4h], edi    ; argc
+│           0x000011c0      4889b520ffff.  mov qword [var_e0h], rsi    ; argv
+│           0x000011c7      64488b042528.  mov rax, qword fs:[0x28]
+│           0x000011d0      488945f8       mov qword [canary], rax
+│           0x000011d4      31c0           xor eax, eax
+│           0x000011d6      48b834407373.  movabs rax, 0x3534323773734034 ; '4@ss7245'
+│           0x000011e0      48898545ffff.  mov qword [s], rax
+│           0x000011e7      66c7854dffff.  mov word [var_b3h], 0x3633  ; '36'
+│           0x000011f0      c6854fffffff.  mov byte [var_b1h], 0
+│           0x000011f7      488d8545ffff.  lea rax, qword [s]
+│           0x000011fe      4889c7         mov rdi, rax                ; const char *s
+│           0x00001201      e84afeffff     call sym.imp.strlen         ; size_t strlen(const char *s)
+│           0x00001206      898540ffffff   mov dword [0xAVar], eax
+│           0x0000120c      b800000000     mov eax, 0
+│           0x00001211      e883ffffff     call sym.banner
+│           0x00001216      488d05f90e00.  lea rax, qword str.Put_the_key: ; 0x2116 ; "Put the key: "
+│           0x0000121d      4889c7         mov rdi, rax                ; const char *format
+│           0x00001220      b800000000     mov eax, 0
+│           0x00001225      e846feffff     call sym.imp.printf         ; int printf(const char *format)
+just print before this and some setup
+
+
+│           0x0000122a      488d8550ffff.  lea rax, qword [s1]
+│           0x00001231      4889c6         mov rsi, rax
+│           0x00001234      488d05e90e00.  lea rax, qword [0x00002124] ; "%s"
+│           0x0000123b      4889c7         mov rdi, rax                ; const char *format
+│           0x0000123e      b800000000     mov eax, 0
+│           0x00001243      e838feffff     call sym.imp.__isoc99_scanf ; int scanf(const char *format)
+scanf for the key
+
+and a little setup for the 2 lines below here
+│           0x00001248      c78538ffffff.  mov dword [var_c8h], 0
+│           0x00001252      c7853cffffff.  mov dword [var_c4h], 0
+│       ┌─< 0x0000125c      eb4d           jmp 0x12ab
+│       │   ; CODE XREF from main @ 0x12b7
+│      ┌──> 0x0000125e      8b8538ffffff   mov eax, dword [var_c8h]
+│      ╎│   0x00001264      4898           cdqe
+│      ╎│   0x00001266      0fb6840545ff.  movzx eax, byte [rbp + rax - 0xbb]	## det her er få en byte fra '4@ss7245' fra højre til venstre
+│      ╎│   0x0000126e      0fbec0         movsx eax, al
+│      ╎│   0x00001271      0fb6c0         movzx eax, al
+│      ╎│   0x00001274      8b953cffffff   mov edx, dword [var_c4h]
+│      ╎│   0x0000127a      4863d2         movsxd rdx, edx
+│      ╎│   0x0000127d      488d4d90       lea rcx, qword [s2]
+│      ╎│   0x00001281      4801d1         add rcx, rdx
+│      ╎│   0x00001284      89c2           mov edx, eax                ;  ...
+│      ╎│   0x00001286      488d059a0e00.  lea rax, qword str.02x      ; 0x2127 ; "%02x"
+│      ╎│   0x0000128d      4889c6         mov rsi, rax                ; const char *format
+│      ╎│   0x00001290      4889cf         mov rdi, rcx                ; char *s
+│      ╎│   0x00001293      b800000000     mov eax, 0
+│      ╎│   0x00001298      e8f3fdffff     call sym.imp.sprintf        ; int sprintf(char *s, const char *format, ...)
+│      ╎│   0x0000129d      838538ffffff.  add dword [var_c8h], 1
+│      ╎│   0x000012a4      83853cffffff.  add dword [var_c4h], 2
+│      ╎│   ; CODE XREF from main @ 0x125c
+│      ╎└─> 0x000012ab      8b8538ffffff   mov eax, dword [var_c8h]
+│      ╎    0x000012b1      3b8540ffffff   cmp eax, dword [0xAVar]
+│      └──< 0x000012b7      7ca5           jl 0x125e
+there is a while loop here so i need to figure that out
+
+
+
+│           0x000012b9      488d4590       lea rax, qword [s2]
+│           0x000012bd      4889c7         mov rdi, rax                ; const char *s
+│           0x000012c0      e88bfdffff     call sym.imp.strlen         ; size_t strlen(const char *s)
+│           0x000012c5      4889c2         mov rdx, rax                ; size_t n
+│           0x000012c8      488d4d90       lea rcx, qword [s2]
+│           0x000012cc      488d8550ffff.  lea rax, qword [s1]
+│           0x000012d3      4889ce         mov rsi, rcx                ; const char *s2
+│           0x000012d6      4889c7         mov rdi, rax                ; const char *s1
+│           0x000012d9      e852fdffff     call sym.imp.strncmp        ; int strncmp(const char *s1, const char *s2, size_t n)
+│           0x000012de      85c0           test eax, eax
+│       ┌─< 0x000012e0      741b           je 0x12fd
+│       │   0x000012e2      488d05430e00.  lea rax, qword str.Incorrect_key ; 0x212c ; "[-] Incorrect key!"
+│       │   0x000012e9      4889c7         mov rdi, rax                ; const char *format
+│       │   0x000012ec      b800000000     mov eax, 0
+│       │   0x000012f1      e87afdffff     call sym.imp.printf         ; int printf(const char *format)
+│       │   0x000012f6      b8ffffffff     mov eax, 0xffffffff         ; -1
+│      ┌──< 0x000012fb      eb19           jmp 0x1316
+│      ││   ; CODE XREF from main @ 0x12e0
+│      │└─> 0x000012fd      488d053b0e00.  lea rax, qword str.Correct_key ; 0x213f ; "[+] Correct key!"
+│      │    0x00001304      4889c7         mov rdi, rax                ; const char *format
+│      │    0x00001307      b800000000     mov eax, 0
+│      │    0x0000130c      e85ffdffff     call sym.imp.printf         ; int printf(const char *format)
+│      │    0x00001311      b800000000     mov eax, 0
+│      │    ; CODE XREF from main @ 0x12fb
+│      └──> 0x00001316      488b55f8       mov rdx, qword [canary]
+│           0x0000131a      64482b142528.  sub rdx, qword fs:[0x28]
+│       ┌─< 0x00001323      7405           je 0x132a
+│       │   0x00001325      e836fdffff     call sym.imp.__stack_chk_fail ; void __stack_chk_fail(void)
+│       │   ; CODE XREF from main @ 0x1323
+│       └─> 0x0000132a      c9             leave
+└           0x0000132b      c3             ret

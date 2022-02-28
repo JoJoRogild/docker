@@ -1,0 +1,205 @@
+            0x00401000      bf01000000     mov edi, 1                  ; [01] -r-x section size 512 named .text
+            0x00401005      488d34250020.  lea rsi, qword map.home_johndoe_Desktop_crackmes_crack.rw
+            0x0040100d      ba11000000     mov edx, 0x11
+            0x00401012      b801000000     mov eax, 1
+            0x00401017      0f05           syscall
+            0x00401019      bf00000000     mov edi, 0
+            0x0040101e      488d7424e0     lea rsi, qword [rsp - 0x20]
+            0x00401023      ba13000000     mov edx, 0x13               ; 19
+            0x00401028      b800000000     mov eax, 0
+            0x0040102d      0f05           syscall
+
+the check under checks if your name is less than 20 bytes
+and it stores the name at rsp -20 and then it stores it at rdi in the wrong order.
+
+            0x0040102f      83f814         cmp eax, 0x14               ; 20
+        ┌─< 0x00401032      7c0a           jl 0x40103e
+        │   0x00401034      b801000000     mov eax, 1
+       ┌──< 0x00401039      e9bb010000     jmp 0x4011f9
+       │└─> 0x0040103e      c64424f700     mov byte [rsp - 9], 0
+       │    0x00401043      488d7c24e0     lea rdi, qword [rsp - 0x20]
+       │    0x00401048      b80a000000     mov eax, 0xa
+       │    0x0040104d      f2ae           repne scasb al, byte [rdi]
+       │    0x0040104f      48ffcf         dec rdi
+       │    0x00401052      c60700         mov byte [rdi], 0
+       │    0x00401055      bf01000000     mov edi, 1
+       │    0x0040105a      488d34251420.  lea rsi, qword loc.p1
+       │    0x00401062      ba13000000     mov edx, 0x13               ; 19
+       │    0x00401067      b801000000     mov eax, 1
+       │    0x0040106c      0f05           syscall
+       │    0x0040106e      bf00000000     mov edi, 0
+       │    0x00401073      488d7424d0     lea rsi, qword [rsp - 0x30]
+       │    0x00401078      ba0a000000     mov edx, 0xa
+       │    0x0040107d      b800000000     mov eax, 0
+       │    0x00401082      0f05           syscall
+
+this gets the serieal and stores it at rsi at rsp -30 så der er en overflow men jeg tror ikke jeg skal prøve at "hacke" det her
+
+
+       │    0x00401084 b    83f80b         cmp eax, 0xb                ; 11
+       │┌─< 0x00401087      7c0a           jl 0x401093
+       ││   0x00401089      b801000000     mov eax, 1
+      ┌───< 0x0040108e      e966010000     jmp 0x4011f9
+      ││└─> 0x00401093      c64424db00     mov byte [rsp - 0x25], 0
+      ││    0x00401098      488d7c24d0     lea rdi, qword [rsp - 0x30]
+      ││    0x0040109d      b80a000000     mov eax, 0xa
+      ││    0x004010a2      f2ae           repne scasb al, byte [rdi]
+      ││    0x004010a4 b    48ffcf         dec rdi
+      ││    0x004010a7      c60700         mov byte [rdi], 0
+
+this just removes the 0xa aka newline from the serieal they also did it with the username 
+
+
+      ││    0x004010aa      b827000000     mov eax, 0x27               ; ''' ; 39
+      ││    0x004010af      0f05           syscall
+
+now that syscall is wierd bc it is the get procces id syscall 
+
+      ││    0x004010b1 b    894424a4       mov dword [rsp - 0x5c], eax
+      ││    0x004010b5      48b82f70726f.  movabs rax, 0x2f636f72702f  ; '/proc/'
+      ││    0x004010bf      48894424b0     mov qword [rsp - 0x50], rax
+      ││    0x004010c4      c6842465ffff.  mov byte [rsp - 0x9b], 0
+      ││    0x004010cc      488dbc2464ff.  lea rdi, qword [rsp - 0x9c]
+      ││    0x004010d4      8b4424a4       mov eax, dword [rsp - 0x5c]
+
+this above just setup some memory
+this loop produced 3231 3431 32 which is 21412 in ascii idk if it is the correct im gonna check that and see if it continusly produces it 
+after checking again it now produces 21620 and i cant help but think it may be converting the pid from hex to decimal im gonna check that next.
+okay pid is 0x547d which is 21629 in decimal and the loop produces 21629 yep it is an hex to decimal converter thingy
+
+      ││┌─> 0x004010d8      83f800         cmp eax, 0
+     ┌────< 0x004010db      7412           je 0x4010ef
+     │││╎   0x004010dd      99             cdq
+     │││╎   0x004010de      b90a000000     mov ecx, 0xa
+     │││╎   0x004010e3      f7f9           idiv ecx
+     │││╎   0x004010e5      80c230         add dl, 0x30                ; 48
+     │││╎   0x004010e8      8817           mov byte [rdi], dl
+     │││╎   0x004010ea      48ffcf         dec rdi
+     │││└─< 0x004010ed      ebe9           jmp 0x4010d8
+     └────> 0x004010ef      48ffc7         inc rdi
+
+
+
+      ││    0x004010f2      4889fe         mov rsi, rdi
+      ││    0x004010f5      488d7c24b6     lea rdi, qword [rsp - 0x4a]
+      ││┌─> 0x004010fa      a4             movsb byte [rdi], byte ptr [rsi]
+      ││╎   0x004010fb      803e00         cmp byte [rsi], 0
+      ││└─< 0x004010fe      75fa           jne 0x4010fa
+      ││    0x00401100      c6072f         mov byte [rdi], 0x2f        ; '/'
+      ││                                                               ; [0x2f:1]=255 ; 47
+      ││    0x00401103      48ffc7         inc rdi
+      ││    0x00401106      c7076d617073   mov dword [rdi], 0x7370616d ; 'maps'
+      ││                                                               ; [0x7370616d:4]=-1
+      ││    0x0040110c      4883c704       add rdi, 4
+      ││    0x00401110      c60700         mov byte [rdi], 0
+      ││    0x00401113      488d7c24b0     lea rdi, qword [rsp - 0x50]
+
+this moves /proc/id/maps into rdi
+
+      ││    0x00401118      31f6           xor esi, esi
+      ││    0x0040111a      31d2           xor edx, edx
+      ││    0x0040111c      b802000000     mov eax, 2
+      ││    0x00401121      0f05           syscall
+
+and with this syscall it opens it self or idont what "file" maps is but im gonna check it out
+maps is where the procces table like where the .text is located and stack and heap and stuff
+
+      ││    0x00401123      894424ac       mov dword [rsp - 0x54], eax
+      ││    0x00401127      8b7c24ac       mov edi, dword [rsp - 0x54]
+      ││    0x0040112b      488d742480     lea rsi, qword [rsp - 0x80]
+      ││    0x00401130      c644248f00     mov byte [rsp - 0x71], 0
+      ││    0x00401135      ba0f000000     mov edx, 0xf                ; 15
+      ││    0x0040113a      b800000000     mov eax, 0
+      ││    0x0040113f      0f05           syscall
+
+and here it just reads a bit just so it can see where it was allocated
+
+      ││    0x00401141      b02d           mov al, 0x2d                ; '-' ; 45
+      ││    0x00401143      488d7c2480     lea rdi, qword [rsp - 0x80]
+      ││    0x00401148      f2ae           repne scasb al, byte [rdi]
+      ││    0x0040114a      48ffcf         dec rdi
+      ││    0x0040114d      c60700         mov byte [rdi], 0
+
+here it just gets the last of 1967-1581787
+                                   -------
+
+
+      ││    0x00401150      8b7c24ac       mov edi, dword [rsp - 0x54]
+      ││    0x00401154      b803000000     mov eax, 3
+      ││    0x00401159      0f05           syscall
+
+and here it closes the file
+
+      ││    0x0040115b      31c0           xor eax, eax
+      ││    0x0040115d      31d2           xor edx, edx
+      ││    0x0040115f      488d7c2480     lea rdi, qword [rsp - 0x80]
+      ││┌─> 0x00401164      803f00         cmp byte [rdi], 0
+     ┌────< 0x00401167      7409           je 0x401172
+     │││╎   0x00401169      8a17           mov dl, byte [rdi]
+     │││╎   0x0040116b      01d0           add eax, edx
+     │││╎   0x0040116d      48ffc7         inc rdi
+     │││└─< 0x00401170      ebf2           jmp 0x401164
+     └────> 0x00401172      8984247cffff.  mov dword [rsp - 0x84], eax
+
+this loop adds all the hex representation of the ascii number together and puts it in rsp-0x84
+
+      ││    0x00401179      31c0           xor eax, eax
+      ││    0x0040117b      488d7c24d0     lea rdi, qword [rsp - 0x30]
+      ││┌─> 0x00401180 b    803f00         cmp byte [rdi], 0
+     ┌────< 0x00401183      7416           je 0x40119b
+     │││╎   0x00401185      99             cdq
+     │││╎   0x00401186      b90a000000     mov ecx, 0xa
+     │││╎   0x0040118b      f7e9           imul ecx
+     │││╎   0x0040118d      31d2           xor edx, edx
+     │││╎   0x0040118f      8a17           mov dl, byte [rdi]
+     │││╎   0x00401191      83c2d0         add edx, -0x30
+     │││╎   0x00401194      00d0           add al, dl
+     │││╎   0x00401196      48ffc7         inc rdi
+     │││└─< 0x00401199      ebe5           jmp 0x401180
+     └────> 0x0040119b      8944249c       mov dword [rsp - 0x64], eax
+
+this loop goes through all of the serial in decimal and adds it eax which starts off with being zero and then multiplyes it with 0xa and then it adds the next and multiply it with 0xa
+and stores it at rsp-0x64 why doesnt this just you push and pull man this is bad written also the map calculated thing could just be hard written.
+
+
+      ││    0x0040119f      31c0           xor eax, eax
+      ││    0x004011a1      31d2           xor edx, edx
+      ││    0x004011a3      8b8c247cffff.  mov ecx, dword [rsp - 0x84]
+
+some setup here ecx = the maps calculated thing and right under is rsi = name
+
+      ││    0x004011aa      488d7424e0     lea rsi, qword [rsp - 0x20]
+      ││┌─> 0x004011af      803e00         cmp byte [rsi], 0
+     ┌────< 0x004011b2      740b           je 0x4011bf
+     │││╎   0x004011b4      8a16           mov dl, byte [rsi]
+     │││╎   0x004011b6      31ca           xor edx, ecx
+     │││╎   0x004011b8      01d0           add eax, edx
+     │││╎   0x004011ba      48ffc6         inc rsi
+     │││└─< 0x004011bd      ebf0           jmp 0x4011af
+     └────> 0x004011bf      89442494       mov dword [rsp - 0x6c], eax
+
+this loop does some xor encryption idont want to hack that i just think i will hack the pin and stores it at rsp-0x6c and 
+AAAA = 0x510 so i got to find a pin that results in 510 because the 1111 is = 0x457
+
+      ││    0x004011c3      8b442494       mov eax, dword [rsp - 0x6c]
+      ││    0x004011c7      8b54249c       mov edx, dword [rsp - 0x64]
+      ││    ;-- rip:
+      ││    0x004011cb      39c2           cmp edx, eax
+      ││┌─< 0x004011cd      750f           jne 0x4011de
+      │││   0x004011cf      488d34252820.  lea rsi, qword loc.m0
+      │││   0x004011d7      ba09000000     mov edx, 9
+     ┌────< 0x004011dc      eb0d           jmp 0x4011eb
+     │││└─> 0x004011de      488d34253420.  lea rsi, qword loc.m1
+     │││    0x004011e6      ba0b000000     mov edx, 0xb                ; 11
+     └────> 0x004011eb      bf01000000     mov edi, 1
+      ││    0x004011f0      b801000000     mov eax, 1
+      ││    0x004011f5      0f05           syscall
+      ││    0x004011f7      31ff           xor edi, edi
+      └└──> 0x004011f9      b83c000000     mov eax, 0x3c               ; '<' ; 60
+            0x004011fe      0f05           syscall
+
+
+
+
+
+ey jeg har hacket det!

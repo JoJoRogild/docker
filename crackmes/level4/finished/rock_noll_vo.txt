@@ -1,0 +1,507 @@
+the second funtion in the second function gets the input
+fuck der er meget kode men det er også i den funtion at det printer hvad for en string den bruger
+
+starter med at cmp rax til 0x2e og rax er 0x10 og så hopper man til case 
+jeg rax er stadig 0x10 fordi jeg blev nød til at restarte
+0x55b8b76fb000 offset er det der så jeg hopper til 1D34 som er case 16 som går hen til en autoleave
+
+ok får at forstå alt koden skal vi forstå den første function og så skal jeg forstå hvad input til switchstatement er
+første function tager 1 argument som den gemmer var_8h og det er det er en pointer til stacken 20d7 c21d fc7f
+det pointer til der hvor man gemte alle de hundredvis af varibles i starten
+
+
+
+
+
+
+        0x563e1d87c597 b    55             push rbp                                                                                                                                                    
+        0x563e1d87c598      4889e5         mov rbp, rsp                                                                                                                                                
+        0x563e1d87c59b      48897df8       mov qword [rbp - 8], rdi                                                                                                                                    
+        0x563e1d87c59f      488b45f8       mov rax, qword [rbp - 8]                                                                                                                                    
+        0x563e1d87c5a3      488b4070       mov rax, qword [rax + 0x70]                                                                                                                                 
+        0x563e1d87c5a7      488d5001       lea rdx, qword [rax + 1]                                                                                                                                    
+        0x563e1d87c5ab      488b45f8       mov rax, qword [rbp - 8]                                                                                                                                    
+        0x563e1d87c5af      48895070       mov qword [rax + 0x70], rdx
+
+her ændrer man rax+0x70 til [rax+0x70] = [rax+0x70]+1 
+rax+0x70 starter med at være ff*8
+
+
+        0x563e1d87c5b3      488b45f8       mov rax, qword [rbp - 8]                                                                                                                                    
+        0x563e1d87c5b7      488b10         mov rdx, qword [rax]                                                                                                                                        
+        0x563e1d87c5ba      488b45f8       mov rax, qword [rbp - 8]                                                                                                                                    
+        0x563e1d87c5be      488b4070       mov rax, qword [rax + 0x70]                                                                                                                                 
+        0x563e1d87c5c2      48c1e003       shl rax, 3
+
+så tager man den værdig der er ved rax+0x70 og laver en shift left 3 bits og så pluser man det til pointeren til de der varibles og så har man offseted hvor man tager de andre offset fra
+
+        0x563e1d87c5c6      4801d0         add rax, rdx               
+
+jeg skal analysere alt over den her:
+rdi er der hvor man skal give varible til næste function
+det første stop pluser den værdi der er ved [rax + 0x70] med 1
+så shift left man det med 3
+i de fleste cases ender man med at pluser det den med 2 nogle gange minus nogle gangeg plus
+med shiftleft så kan man få en offset på fx 2 til at blive 0x10 og det er der hvor det starter 
+
+
+
+            0x563e1d87c5c9      488b00         mov rax, qword [rax]                                                                                                                                        
+ 
+ nej der er faktisk noget kopiring over men jeg kan ikke helt finde det og jeg tror ikke det er så vittigt
+ oven over det her er der bare setup og her så får man det første varible 
+
+
+            0x563e1d87c5cc      0fb6d0         movzx edx, al                                                                                                                                               
+            0x563e1d87c5cf      488b45f8       mov rax, qword [rbp - 8]                                                                                                                                    
+            0x563e1d87c5d3      488990880000.  mov qword [rax + 0x88], rdx      
+
+her kopiere man værdien en til et andet sted og rax er den globale memory address hvor man har gemt værdien ind til alle de der varibles
+
+            0x563e1d87c5da      488b45f8       mov rax, qword [rbp - 8]                                                                                                                                    
+            0x563e1d87c5de      488b10         mov rdx, qword [rax]                                                                                                                                        
+            0x563e1d87c5e1      488b45f8       mov rax, qword [rbp - 8]                                                                                                                                    
+            0x563e1d87c5e5      488b4070       mov rax, qword [rax + 0x70]                                                                                                                                 
+            0x563e1d87c5e9      4883c001       add rax, 1                                                                                                                                                  
+            0x563e1d87c5ed      48c1e003       shl rax, 3                                                                                                                                                  
+            0x563e1d87c5f1      4801d0         add rax, rdx                                                                                                                                                
+            0x563e1d87c5f4      488b10         mov rdx, qword [rax]     
+
+rdx er nummer 2 varible
+
+
+            0x563e1d87c5f7      488b45f8       mov rax, qword [rbp - 8]                                                                                                                                    
+            0x563e1d87c5fb      488990900000.  mov qword [rax + 0x90], rdx 
+
+så kopiere man den her til det der globale sted
+alle varibles er spaced med 8 bytes
+
+            0x563e1d87c602      488b45f8       mov rax, qword [rbp - 8]                                                                                                                                    
+            0x563e1d87c606      488b10         mov rdx, qword [rax]                                                                                                                                        
+            0x563e1d87c609      488b45f8       mov rax, qword [rbp - 8]                                                                                                                                    
+            0x563e1d87c60d      488b4070       mov rax, qword [rax + 0x70]                                                                                                                                 
+            0x563e1d87c611      4883c002       add rax, 2                                                                                                                                                  
+            0x563e1d87c615      48c1e003       shl rax, 3                                                                                                                                                  
+            0x563e1d87c619      4801d0         add rax, rdx                                                                                                                                                
+            0x563e1d87c61c      488b10         mov rdx, qword [rax]      
+
+man kopiere nummer 3 varible der
+
+
+            0x563e1d87c61f      488b45f8       mov rax, qword [rbp - 8]                                                                                                                                    
+            0x563e1d87c623      488990980000.  mov qword [rax + 0x98], rdx                                                                                                                                 
+            
+man kopiere den til bage igen til det globale sted
+
+            0x563e1d87c62a      90             nop                                                                                                                                                         
+            0x563e1d87c62b      5d             pop rbp                                                                                                                                                     
+            0x563e1d87c62c      c3             ret 
+så den her function kopiere 3 varible ind til det her sted
+den her function kopiere 3 eller 4 varibles til det her globale sted vær gang den køre. men de varibles ændrer sig vær gang og den overskrive de varibles den havde kopieret før
+
+
+
+
+
+plan find ud af hvordan switch statementen virker rdi er det eneste argument og det peger på der hvor varibles er fra function før
+den starter med at tage nummer 2 varible
+0x0000179d      488b80900000.  mov rax, qword [rax + 0x90]
+så gemmer den det varible et nyt sted og tager nummer 3 og gemmer det et nyt sted
+│0x000017ac      488b80980000.  mov rax, qword [rax + 0x98]                                                                                                                                     
+│0x000017b3      488945e0       mov qword [var_20h], rax
+så tager den nummer 1 og gememr den et nyt sted
+0x000017bb      488b80880000.  mov rax, qword [rax + 0x88]                                                                                                                                     
+│0x000017c2      488945e8       mov qword [var_18h], rax
+
+så minuser man 0x10 fra det første argument og checker om det er over 0x2e
+hvis det er så får man en invalid instruction reached ting og quiter
+man regner hopped ud med 0x3050-[0x3050+(varible1-0x10)*4] og sidste case er ved 0x0000258f
+og alting nede i 0x3050 starter med ffff så det er basicly 0x3050-varible stuff det er det jeg har får nu
+første varible giver case 0
+og varible 2 er case 1 så switch statementen virker med:
+var-0x10 = whch case so if var is 0x12 then the case is 2 of var is 0x10 then the case is 0
+
+nu skal jeg bare finde ud af hvad casesne gør:
+case 0:
+[*vars + 0x20 + second*8] = [*vars + 0x20 + third*8]
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 1:
+[*vars + 0x20 + second*8] = third
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 2:
+[*vars + 0x20 + second*8] = third
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 3:
+xor [*vars + 0x20 + third*8], [*vars + 0x20 + second*8]
+[*vars + 0x20 + second*8] = rdx
+
+xor [*vars + 0x20 + second*8], [*vars + 0x20 + third*8]
+[*vars + 0x20 + third*8] = rdx
+
+xor [*vars + 0x20 + third*8], [*vars + 0x20 + second*8]
+[*vars + 0x20 + second*8] = rdx
+
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 4:
+[*vars + 0x20 + second*8] = [*vars + 0x20 + second*8] + [*vars + 0x20 + third*8]
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 5:
+[*vars + 0x20 + second*8] = [*vars + 0x20 + second*8] + third
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 6:
+[*vars + 0x20 + second*8] = [*vars + 0x20 + second*8] - [*vars + 0x20 + third*8]
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 7:
+[*vars + 0x20 + second*8] = [*vars + 0x20 + second*8] - third
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 8:
+[*vars + 0x20 + second*8] = [*vars + 0x20 + second*8] / [*vars + 0x20 + third*8]
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 9:
+[*vars + 0x20 + second*8] = [*vars + 0x20 + second*8] / third
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 10:
+[*vars + 0x20 + second*8] = [*vars + 0x20 + third*8] * [*vars + 0x20 + second*8]
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 11:
+[*vars + 0x20 + second*8] = [*vars + 0x20 + second*8] * third
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 12:
+[*vars + 0x20 + second*8] = [*vars + 0x20 + second*8] % [*vars + 0x20 + third*8]
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 13:
+[*vars + 0x20 + second*8] = [*vars + 0x20 + second*8] % third
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+case 14:
+den første er ligegyldig jeg skriver kun nummer 2 gang ned der hvor man skriver input
+syscall 0(0, 0, [*vars + 0x30], 0x7f)
+syscall 0(idk, idk, buf, len)
+[*vars + 0x20] = length
+
+case 15:
+spinger den her over og kommer tilbage
+
+
+case 16:
+[*vars + 0x70] = second - 1
+
+
+case 17:
+if ([*vars + 0xa0] == 0){
+    [*vars + 0x70] = [*vars + 0x70] + 1
+}
+else{
+    [*vars + 0x70] = second - 1
+    [*vars + 0xa0] = 0
+}
+
+
+case 18:
+if ([*vars + 0xa0] == 0){
+    [*vars + 0x70] = second - 1
+    [*vars + 0xa0] = 0
+}
+else{
+    [*vars + 0x70] = [*vars + 0x70] + 1
+}
+
+
+case 19:
+if ([*vars + 0xa8] == 0){
+    [*vars + 0x70] = [*vars + 0x70] + 1
+}
+else{
+    [*vars + 0x70] = second - 1 
+    [*vars + 0xa8] = 0
+}
+
+
+case 20:
+if([*vars + 0xa8] == 0){
+    [*vars + 0x70] = second - 1 
+    [*vars + 0xa8] = 0
+}
+else{
+    [*vars + 0x70] = [*vars + 0x70] + 1
+}
+
+
+case 21:
+if([*vars + 0xb0] == 0){
+    [*vars + 0x70] = [*vars + 0x70] + 1
+}
+else{
+    [*vars + 0x70] = second - 1 
+    [*vars + 0xb0] = 0
+}
+
+
+case 22:
+if([*vars + 0xb0] == 0){
+    [*vars + 0x70] = second - 1 
+    [*vars + 0xb0] = 0
+}
+else{
+    [*vars + 0x70] = [*vars + 0x70] + 1
+}
+
+
+case 23:
+[*vars + 0x20 + second*8] = [*vars + 0x20 + second*8] - 1
+[*vars + 0x70] = [*vars + 0x70] + 1
+
+
+case 24:
+[*vars + 0x20 + second*8] = [*vars + 0x20 + second*8] + 1
+[*vars + 0x70] = [*vars + 0x70] + 1
+
+
+case 25:
+[*vars + 0x60] = [*vars + 0x68]
+[*vars + 0x70] = [*vars + 0x70] + 1
+
+
+case 26:
+der er en function i så jeg springer lige den her over for nu
+fcn.000027ef
+
+
+case 27:
+der er en til function i det er ikke den samme
+fcn.00002830
+
+
+case 28:
+der er også en function i samme som 26
+fcn.000027ef
+
+
+case 29:
+der er også en function i samme som 26
+fcn.000027ef
+
+
+case 30:
+der er også en function i samme som 28
+fcn.00002830
+
+
+case 31:
+der er også en function i 
+fcn.00002665
+
+
+case 32:
+der er også en function i samme som i 31
+fcn.00002665
+
+
+case 33:
+der er også en function i samme som i 31
+fcn.00002665
+
+
+case 34:
+der er også en function i sammme som i 31
+fcn.00002665
+
+
+case 35:
+[*vars + 0x20 + second*8] = [*vars + 0x20 + third*8] && [*vars + 0x20 + second*8]
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 36:
+[*vars + 0x20 + second*8] = [*vars + 0x20 + second*8] && third
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 37:
+[*vars + 0x20 + second*8] = [*vars + 0x20 + second*8] || [*vars + 0x20 + third*8]
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 38:
+[*vars + 0x20 + second*8] = [*vars + 0x20 + second*8] || third
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 39:
+[*vars + 0x20 + second*8] = [*vars + 0x20 + second*8] ^ [*vars + 0x20 + third*8]
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 40:
+[*vars + 0x20 + second*8] = [*vars + 0x20 + second*8] ^ third
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 41:
+[*vars + 0x20 + second*8] = shr([*vars + 0x20 + second*8], [*vars + 0x20 + third*8])
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 42:
+[*vars + 0x20 + third*8] = shr([*vars + 0x20 + third*8], third)
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 43:
+[*vars + 0x20 + second*8] = shl([*vars + 0x20 + second*8], [*vars + 0x20 + third*8])
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 44:
+[*vars + 0x20 + second*8] = shl([*vars + 0x20 + second*8], third)
+[*vars + 0x70] = [*vars + 0x70] + 2
+
+
+case 45:
+rcx = [*vars + 0x38]
+rdx = [*vars + 0x30] samme som rsi
+rsi = [*vars + 0x28]
+rdx = [*vars + 0x20]
+[*vars + 0x20] = call fcn.00001705
+
+det er noget encryption første input = 0x6f802ddda0bef6c1
+                                       0x6f802ddda0bef6c1
+det er noget encryption og så ret en = 0x0
+efter det laver den "haha ur bad"
+
+jeg ved ikke hvad den function gør
+der er så meget til den der function jeg ikke kan undersøge alt
+
+case 15:
+det her er hvor alle kommer hen så det er en exit
+
+
+default:
+exit program
+
+
+
+fcn.00001705://argument 2 = input
+argument1 var 2 i det jeg tested
+if (argument1 == 2){
+    ret  call fcn.00001687(argument2)
+}
+else if (argument1 > 2){
+    ret 0
+}
+else if (argument1 == 0){
+    ret  call 0x2a99(00, input)
+}
+else if (argument1 == 1){
+    call 0x2b4d(00, input)
+    ret 0
+}
+else{
+    ret 0
+}
+
+
+fcn.00001687:
+argument1 = input
+wierdVal = 0xcbf29ce484222325
+i = 0
+
+if(argument1[0] = 0){
+    ret 0xcbf29ce484222325
+}
+while ([argument1 + i] != 0xa aka newline){
+    wierdVal *= 0x100000001b3
+    wierdVal ^= [argument1 + i]
+    i += 1
+    if(argument1[i] = 0){
+        ret wierdVal
+    }
+}
+ret wierdVal
+
+
+
+
+fcn.000027ef:
+2 arguments
+[[argument1 + 0x10] + shl([argument1 + 0x60])] = argument2
+[argument1 + 0x60] = [argumen1+0x60] - 1
+
+
+fcn.00002830:
+111111
+1: enter:
+1111111111
+1: input:
+11111111111111111
+1:haha ur bad
+
+
+6 og så 7 print enter           den er rigtig hvis man har breakpoint før called
+10 og så 11 og input            den er også rigtig
+17 og så 18 print haha ur bad   den er også rigtig
+
+
+jeg tror det her er hashed 0x6658a617bcce24d5
+
+
+
+jeg skal finde ud af hvordan man opbygger en instruction
+in instruction består af 3 variabler
+den første er hvilken case aka instruction det
+
+
+så en instruction er bare case, arg1, arg2
+skulle jeg prøve at reverse engineer programmet eller skal jeg være ligeglad og bare hack det jeg hacker det jeg skal bare finde ud af hvor de bruger hashed
+der er et input hash tror jeg ved   1111111111111111111111111111
+og så er det rigtige hash ved       11111111111111111111111111111
+jeg hashed ændrer sig men jeg tror hvis det er lig med hashed så har man vundet
+
+input hash("AAAABBBB\n") = a0bef6c1
+hash                     = bcce24d5
+input hash("AAAABBBB\n") = a0bef6c1 så der er ikke noget tilfædighed eller tid i det så det er godt
+yeah hvis man gør det kan jeg hacke programmetså jeg skal finde ud af hvordan hash function virker og så skrive et program det hasher rockyou og checker med det der hash jeg har her                    
+
+
+ok så de første 18 cases er for print("Enter: ") og input og efter det er der 11 cases hvor den sidste er cmp så jeg skal finde ud af dem
+
+instruction1:  11 00 02
+11 = case 1
+[*vars + 0x20] = 02
+
+instruction2: 10 01 02
+[*vars + 0x28] = [*vars + 0x30]
+lidt mere setuå tror jeg bare
+
+instruction3: 3d 2c 00
+dvs case 45
+så kører man encryption functionen med input og 0x02 og maks længe 0x7f
+det giver 0x6f802ddd a0bef6c1
+så det er hash function jeg skal bare reverse det hash
+så hash function er fcn.00001687

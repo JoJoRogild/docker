@@ -1,0 +1,113 @@
+┌ 274: int main (int argc, char **argv, char **envp);
+│           ; var int64_t var_23h @ rbp-0x23
+│           ; var char *var_22h @ rbp-0x22
+│           ; var int64_t var_18h @ rbp-0x18
+│           ; var int64_t var_17h @ rbp-0x17
+│           ; var int64_t var_fh @ rbp-0xf
+│           ; var int64_t var_dh @ rbp-0xd
+│           ; var signed int64_t var_ch @ rbp-0xc
+│           ; var signed int64_t var_8h @ rbp-0x8
+│           ; var signed int64_t var_4h @ rbp-0x4
+│           0x00001155      55             push rbp
+│           0x00001156      4889e5         mov rbp, rsp
+│           0x00001159      4883ec30       sub rsp, 0x30
+│           0x0000115d      48b862706661.  movabs rax, 0x626f676a61667062 ; 'bpfajgob'
+│           0x00001167      488945e9       mov qword [var_17h], rax
+│           0x0000116b      66c745f16977   mov word [var_fh], 0x7769   ; 'iw'
+│           0x00001171      c645f300       mov byte [var_dh], 0
+│           0x00001175      488d3d8c0e00.  lea rdi, qword str.The_magic_string: ; 0x2008 ; "The magic string: " ; const char *format
+│           0x0000117c      b800000000     mov eax, 0
+│           0x00001181      e8bafeffff     call sym.imp.printf         ; int printf(const char *format)
+│           0x00001186      c745fc000000.  mov dword [var_4h], 0
+│       ┌─< 0x0000118d      eb24           jmp 0x11b3
+│       │   ; CODE XREF from main @ 0x11b7
+│      ┌──> 0x0000118f      488d55de       lea rdx, qword [var_22h]
+│      ╎│   0x00001193      8b45fc         mov eax, dword [var_4h]
+│      ╎│   0x00001196      4898           cdqe
+│      ╎│   0x00001198      4801d0         add rax, rdx
+│      ╎│   0x0000119b      4889c6         mov rsi, rax
+│      ╎│   0x0000119e      488d3d760e00.  lea rdi, qword [0x0000201b] ; " %c" ; const char *format
+│      ╎│   0x000011a5      b800000000     mov eax, 0
+│      ╎│   0x000011aa      e8a1feffff     call sym.imp.__isoc99_scanf ; int scanf(const char *format)
+│      ╎│   0x000011af      8345fc01       add dword [var_4h], 1
+│      ╎│   ; CODE XREF from main @ 0x118d
+│      ╎└─> 0x000011b3      837dfc09       cmp dword [var_4h], 9
+│      └──< 0x000011b7      7ed6           jle 0x118f
+
+
+it scansf until it has 9 characters which is 8 right? nope until it has 10 characters like AAAABBBBCC and stores it in var_22h and puts pbpfajgobiw right after with no zero byte between
+
+
+│           0x000011b9      c745f8000000.  mov dword [var_8h], 0
+│       ┌─< 0x000011c0      eb3a           jmp 0x11fc
+│       │   ; CODE XREF from main @ 0x1200
+│      ┌──> 0x000011c2      837df806       cmp dword [var_8h], 6
+│     ┌───< 0x000011c6      7f19           jg 0x11e1
+│     │╎│   0x000011c8      8b45f8         mov eax, dword [var_8h]
+│     │╎│   0x000011cb      8d4803         lea ecx, dword [rax + 3]
+│     │╎│   0x000011ce      8b45f8         mov eax, dword [var_8h]
+│     │╎│   0x000011d1      4898           cdqe
+│     │╎│   0x000011d3      0fb65405de     movzx edx, byte [rbp + rax - 0x22] ## edx = byte fra input
+│     │╎│   0x000011d8      4863c1         movsxd rax, ecx
+│     │╎│   0x000011db      885405d3       mov byte [rbp + rax - 0x2d], dl
+│    ┌────< 0x000011df      eb17           jmp 0x11f8
+│    ││╎│   ; CODE XREF from main @ 0x11c6
+│    │└───> 0x000011e1      8b45f8         mov eax, dword [var_8h]
+│    │ ╎│   0x000011e4      8d48f9         lea ecx, dword [rax - 7]
+│    │ ╎│   0x000011e7      8b45f8         mov eax, dword [var_8h]
+│    │ ╎│   0x000011ea      4898           cdqe
+│    │ ╎│   0x000011ec      0fb65405de     movzx edx, byte [rbp + rax - 0x22]
+│    │ ╎│   0x000011f1      4863c1         movsxd rax, ecx
+│    │ ╎│   0x000011f4      885405d3       mov byte [rbp + rax - 0x2d], dl
+│    │ ╎│   ; CODE XREF from main @ 0x11df
+│    └────> 0x000011f8      8345f801       add dword [var_8h], 1
+│      ╎│   ; CODE XREF from main @ 0x11c0
+│      ╎└─> 0x000011fc      837df809       cmp dword [var_8h], 9
+│      └──< 0x00001200      7ec0           jle 0x11c2
+
+this scrambles stuff im gonna use the input "0123456789" bagefter så jeg kan se rækkefølgen
+7890123456
+
+│           0x00001202      c645e800       mov byte [var_18h], 0
+│           0x00001206      c645dd00       mov byte [var_23h], 0
+│           0x0000120a      c745f4000000.  mov dword [var_ch], 0
+│       ┌─< 0x00001211      eb2f           jmp 0x1242
+│       │   ; CODE XREF from main @ 0x1246
+│      ┌──> 0x00001213      8b45f4         mov eax, dword [var_ch]
+│      ╎│   0x00001216      4898           cdqe
+│      ╎│   0x00001218      0fb65405d3     movzx edx, byte [rbp + rax - 0x2d]
+│      ╎│   0x0000121d      8b45f4         mov eax, dword [var_ch]
+│      ╎│   0x00001220      4898           cdqe
+│      ╎│   0x00001222      0fb64405e9     movzx eax, byte [rbp + rax - 0x17]
+│      ╎│   0x00001227      38c2           cmp dl, al
+
+in this compare you can see your input getting compared to what it should be 
+so it should be 
+7890123456
+7 = b, 8 = p, 9 = f, 0 = a, 1 = j, 2, = g, 3 = o, 4 = b, 5 = i, 6 = w
+0123456789
+ajgobiwbpf
+
+│     ┌───< 0x00001229      7413           je 0x123e
+│     │╎│   0x0000122b      488d3ded0d00.  lea rdi, qword str.Sorry__wrong_input_: ; 0x201f ; "Sorry, wrong input :(" ; const char *s
+│     │╎│   0x00001232      e8f9fdffff     call sym.imp.puts           ; int puts(const char *s)
+│     │╎│   0x00001237      b800000000     mov eax, 0
+│    ┌────< 0x0000123c      eb27           jmp 0x1265
+│    ││╎│   ; CODE XREF from main @ 0x1229
+│    │└───> 0x0000123e      8345f401       add dword [var_ch], 1
+│    │ ╎│   ; CODE XREF from main @ 0x1211
+│    │ ╎└─> 0x00001242      837df409       cmp dword [var_ch], 9
+│    │ └──< 0x00001246      7ecb           jle 0x1213
+│    │      0x00001248      488d45de       lea rax, qword [var_22h]
+│    │      0x0000124c      4889c6         mov rsi, rax
+│    │      0x0000124f      488d3de20d00.  lea rdi, qword str.Congratulations__correct_flag___The_flag_is:_WatadCTF__s ; 0x2038 ; "Congratulations, correct flag!\nThe flag is: WatadCTF{%s}\n" ; const char *format
+│    │      0x00001256      b800000000     mov eax, 0
+│    │      0x0000125b      e8e0fdffff     call sym.imp.printf         ; int printf(const char *format)
+│    │      0x00001260      b800000000     mov eax, 0
+│    │      ; CODE XREF from main @ 0x123c
+│    └────> 0x00001265      c9             leave
+└           0x00001266      c3             ret
+
+
+
+the magic string is ajgobiwbpf
