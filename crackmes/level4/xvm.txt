@@ -1,5 +1,6 @@
 this is the function that writes one char into memory i think
 de 2 argumenter er at
+
 rdi = pointer til .text string
 rsi = char
 den skriver det ikke ind i memory fordi den overskriver det vær gang
@@ -260,4 +261,35 @@ så dem jeg skal reverse er
 45
 48
 default
+
+fcn.00004a7c:
+, 2)
+
+
+
+var1 = var_20h
+var2 = var_28h
+var3 = var_48h
+var4 = var_50h
+[var4+0x10] = *to pointer to input
+[var3+0x3c] = cafe værdi
+
+0:
+starter med memcheck
+var2[0] = dword var1[0]
+ret
+
+1:
+starter med memcheck
+var2[0] = byte var1[0]
+
+2:
+starter med mecheck
+var2[0] = word var[1]
+
+5:
+fcn.00004a7c([var4+0x10], [var3+0x3c], 2)
+
+
+
 
