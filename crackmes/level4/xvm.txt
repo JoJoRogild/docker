@@ -188,6 +188,8 @@ function liste:
 0xXXXXXbc = seg fault så den er ligegyldig
 0xXXXXXE0 = Seg fault hvis pointer til bytes er 00
 
+0xXXXXX7C = ret den der 0x1337 værdi der hvor du er noget til
+0xXXXXX5B
 
 de var man sætter til nul før casene er åbenbart ikke nul
 de bliver ændred af nederste function før cases
@@ -274,10 +276,11 @@ var4 = var_50h
 [var4+0x10] = *to pointer to input
 [var3+0x3c] = cafe værdi
 
+ok jeg skal finde instruction pointer og stackpointer så det gør jeg med at køre vm og se hvad der bliver added½
+
 0:
 starter med memcheck
 var2[0] = dword var1[0]
-ret
 
 1:
 starter med memcheck
@@ -288,8 +291,19 @@ starter med mecheck
 var2[0] = word var[1]
 
 5:
-fcn.00004a7c([var4+0x10], [var3+0x3c], 2)
+[var3+0x34] = fcn.00004a7c([var4+0x10], [var3+0x3c], 2)
+edx = [var3 + 0x3c] + 4
+[var3 + 0x3c] = [var3 + 0x3c] + 4
+
+6:
+starter med memcheck
+[var3 + 0x3c] = [var3 + 0x3c] - 4
+fcn.00004f5b([var4 + 0x10], [var3 + 0x3c], [var3 + 0x34)
+[var3 + 0x34] = [var2]
+nok ik noget med hash at gøre
+
+7:
+nok noget med hash at gøre
 
 
-
-
+ok man
