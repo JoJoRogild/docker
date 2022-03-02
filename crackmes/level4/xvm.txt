@@ -305,5 +305,17 @@ nok ik noget med hash at gøre
 7:
 nok noget med hash at gøre
 
+8:
+
+
+
+ok helt ny plan jeg skal skrive et program der tager en tekst fil og reverse den til assembly ku det ik v�re sjovt?
+ok jeg skal starte med at definere nogle functioner meget oræcst
+0x48 =
+0xbc = seg fault
+0x65 = tager 2 args.  arg2 er rip. arg1 er den med alle værdier der fører til varsne
+
+
+
 
 ok man
