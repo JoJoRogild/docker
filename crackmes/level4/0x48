@@ -1,0 +1,68 @@
+arg int64_t arg2 @ rsi
+|           ; arg int64_t arg3 @ rdx
+|           0x00004948      f30f1efa       endbr64
+|           0x0000494c      55             push rbp
+|           0x0000494d      4889e5         mov rbp, rsp
+|           0x00004950      4883ec20       sub rsp, 0x20
+|           0x00004954      48897de8       mov qword [var_18h], rdi    ; arg1
+|           0x00004958      8975e4         mov dword [var_1ch], esi    ; arg2
+|           0x0000495b      89d0           mov eax, edx                ; arg3
+|           0x0000495d      8845e0         mov byte [var_20h], al
+|           0x00004960      8b55e4         mov edx, dword [var_1ch]
+|           0x00004963      488b45e8       mov rax, qword [var_18h]
+|           0x00004967      89d6           mov esi, edx                ; uint32_t arg2
+|           0x00004969      4889c7         mov rdi, rax                ; int64_t arg1
+|           0x0000496c      e8f40c0000     call fcn.00005665
+|           0x00004971      488945f8       mov qword [var_8h], rax
+|           0x00004975      48837df800     cmp qword [var_8h], 0
+|       ,=< 0x0000497a      744b           je 0x49c7
+|       |   0x0000497c      488b45f8       mov rax, qword [var_8h]
+|       |   0x00004980      8b501c         mov edx, dword [rax + 0x1c]
+|       |   0x00004983      0fb645e0       movzx eax, byte [var_20h]
+|       |   0x00004987      83c801         or eax, 1
+|       |   0x0000498a      0fb6c0         movzx eax, al
+|       |   0x0000498d      21d0           and eax, edx
+|       |   0x0000498f      85c0           test eax, eax
+|      ,==< 0x00004991      7514           jne 0x49a7
+uint32_t arg3
+|      ||   0x00004996      488b45f8       mov rax, qword [var_8h]
+|      ||   0x0000499a      4889c6         mov rsi, rax                ; char **arg2
+|      ||   0x0000499d      bf00000000     mov edi, 0                  ; uint32_t arg1
+|      ||   0x000049a2      e8151b0000     call fcn.000064bc
+|      ||   ; CODE XREF from fcn.00004948 @ 0x4991
+|      `--> 0x000049a7      488b45f8       mov rax, qword [var_8h]
+|       |   0x000049ab      488b5008       mov rdx, qword [rax + 8]
+|       |   0x000049af      488b45f8       mov rax, qword [var_8h]
+|       |   0x000049b3      8b4014         mov eax, dword [rax + 0x14]
+|       |   0x000049b6      8b4de4         mov ecx, dword [var_1ch]
+|       |   0x000049b9      29c1           sub ecx, eax
+|       |   0x000049bb      89c8           mov eax, ecx
+|       |   0x000049bd      89c0           mov eax, eax
+|       |   0x000049bf      4801d0         add rax, rdx
+|       |   0x000049c2      0fb600         movzx eax, byte [rax]
+|      ,==< 0x000049c5      eb19           jmp 0x49e0
+|      ||   ; CODE XREF from fcn.00004948 @ 0x497a
+|      |`-> 0x000049c7      8b55e4         mov edx, dword [var_1ch]    ; uint32_t arg3
+|      |    0x000049ca      488b45f8       mov rax, qword [var_8h]
+|      |    0x000049ce      4889c6         mov rsi, rax0x000049d1      bf03000000     mov edi, 3
+|       |   0x000049d6      e8e11a0000     call fcn.000064bc
+        |   0x000049db      b8ffffffff     mov eax, 0xffffffff
+|       |   ; CODE XREF from fcn.00004948 @ 0x49c5
+|       `-> 0x000049e0      c9             leave
+\           0x000049e1      c3             ret
+
+var_18h = rdi
+var_1ch = rsi
+var_20h = byte(rdx)
+var_8 = 0x65(var_18h, var_1ch)
+if (var_8 == 0){
+ segfault
+}
+if ([var_8 + 0x1c] & (var_20h || 1) == 0) {
+ segfault
+}
+
+
+
+
+
