@@ -51,9 +51,9 @@ uint32_t arg3
 |       `-> 0x000049e0      c9             leave
 \           0x000049e1      c3             ret
 
-var_18h = rdi
-var_1ch = rsi
-var_20h = byte(rdx)
+var_18h = rdi		pointer to the vars to .text
+var_1ch = rsi		0x133370
+var_20h = byte(rdx) 	4
 var_8 = 0x65(var_18h, var_1ch)
 if (var_8 == 0){
  segfault
@@ -61,8 +61,8 @@ if (var_8 == 0){
 if ([var_8 + 0x1c] & (var_20h || 1) == 0) {
  segfault
 }
-ret [var_1ch - [var_8 + 0x14] + [var_8 + 8]]
-
+ret byte [var_1ch - [var_8 + 0x14] + [var_8 + 8]]
+den returner bare en byte fra det der
 
 
 
