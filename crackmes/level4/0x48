@@ -61,6 +61,7 @@ if (var_8 == 0){
 if ([var_8 + 0x1c] & (var_20h || 1) == 0) {
  segfault
 }
+ret [var_1ch - [var_8 + 0x14] + [var_8 + 8]]
 
 
 
