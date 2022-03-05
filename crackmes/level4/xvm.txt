@@ -316,6 +316,11 @@ ok jeg skal starte med at definere nogle functioner meget orÃ¦cst
 0x65 = tager 2 args.  arg2 er rip. arg1 er den med alle vÃ¦rdier der fÃ¸rer til varsne
 0x65 = tager 2 args det ene er det samme. det andet er I og den her func returner pointer til memseg til der hvor I er fx 0x13337 = .text seg 0xcafe = .stack seg
 næste jeg skal finde er 0x3d og inde i den skal jeg finde 0x1b, 0xa9
+0x1b = tager 2 args der ene(rsi) et tal i det her tilfælde 0xe og det andet(rdi) peger på stacke pointer
+0x1b = returner værdier fra stackpointer, basepointer og instructionpointer og kan returner flere vædier hvis de er gemt før de her værdier men case 13 = rip case 14 = rbp case 15 = rsp
+0xa9 = laver lidt memcheck lort som er ligegyldig og ellers returner den bare pointer til der hvor du er noget til
+0x3d = den pluser 4 til rip og pusher noget på stacken men ellers tror jeg faktisk ikke der sker noget intersant i den her er det ikke lidt sjovt. fuck den ændrer jo de 2 vars der som er 0
+0x3d: den ændrer faktisk i den store function var_28h til det sted man er noget til sådan rigtigt så ikke engang en 01337 værdi og var_3ch til cafe værdi
+jeg går tilbage til den hurtig måde og læse et writeup efter det her yeah.
 
 
-ok man
