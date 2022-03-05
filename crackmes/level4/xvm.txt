@@ -315,7 +315,7 @@ ok jeg skal starte med at definere nogle functioner meget oræcst
 0xbc = seg fault
 0x65 = tager 2 args.  arg2 er rip. arg1 er den med alle værdier der fører til varsne
 0x65 = tager 2 args det ene er det samme. det andet er I og den her func returner pointer til memseg til der hvor I er fx 0x13337 = .text seg 0xcafe = .stack seg
-
+n�ste jeg skal finde er 0x3d og inde i den skal jeg finde 0x1b, 0xa9
 
 
 ok man
