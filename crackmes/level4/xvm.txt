@@ -270,7 +270,7 @@ fcn.00004a7c:
 
 
 var1 = var_20h
-var2 = var_28h
+var2 = var_28h //where your are at
 var3 = var_48h
 var4 = var_50h
 [var4+0x10] = *to pointer to input
@@ -306,8 +306,9 @@ nok ik noget med hash at gÃ¸re
 nok noget med hash at gÃ¸re
 
 8:
-
-
+starter med memcheck
+esi = [var_28h]
+rax = [var_20h]
 
 ok helt ny plan jeg skal skrive et program der tager en tekst fil og reverse den til assembly ku det ik vÃre sjovt?
 ok jeg skal starte med at definere nogle functioner meget orÃ¦cst
@@ -322,5 +323,5 @@ næste jeg skal finde er 0x3d og inde i den skal jeg finde 0x1b, 0xa9
 0x3d = den pluser 4 til rip og pusher noget på stacken men ellers tror jeg faktisk ikke der sker noget intersant i den her er det ikke lidt sjovt. fuck den ændrer jo de 2 vars der som er 0
 0x3d: den ændrer faktisk i den store function var_28h til det sted man er noget til sådan rigtigt så ikke engang en 01337 værdi og var_3ch til cafe værdi
 jeg går tilbage til den hurtig måde og læse et writeup efter det her yeah.
-
-
+0x3d = hvornår sætter den de der vars. arg5(r8) = pointer til var_20h og arg4(rcx) = pointer til var_28h
+jeg ved ikke hvordan jeg skal hacke den her jeg bliver nød til at læse writeujeg ved ikke hvordan jeg skal hacke den her jeg bliver nød til at læse writeupp

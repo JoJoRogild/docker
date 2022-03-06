@@ -1,0 +1,657 @@
+This crackme supplies you with a program (pyaz.xvm) written in a kind of bytecode for a simple
+virtual machine (xvm). By reverse engineering how the vm works, one learns how to interpret the
+given bytecode, allowing them to understand the given program. As far as vm crackmes go, this one is
+definitely on the easier end, since the vm itself does not do anything complex or exotic: it is
+clean, straightforward C code filled with debug strings telling you exactly what each part of the
+code does.
+
+One way this challenge differs from other vm crackmes is that instead of just containing the raw
+bytecode and auxiliary data needed to run an xvm program, the file pyaz.xvm also contains
+information about program metadata (sections, symbols, etc.). In other words, pyaz.xvm has a file
+structure similar in spirit to that of, say, a PE file. Thus, in addition to understanding how the
+xvm bytecode works, we also have to learn how xvm program files are structured.
+
+
+
+                                ================================
+                                  1. Loading XVM program files
+                                ================================
+
+To start, we should point out that the original xvm file is packed with UPX, so before doing any
+analysis, we should first unpack it:
+
+    $ upx -d xvm
+
+With this out of the way, we can jump right into the vm's main function, located @ 0x1015e9. The
+first interesting thing main does is create two objects that will play an important role in what
+follows. The first, which I'll call a Context object, will hold all the vm register values as xvm
+programs are run. There are 16 such registers, as well as a flags register; each are 32 bits.
+
+    struct Context
+    {
+        dword   r0;
+        dword   r1;
+        dword   r2;
+        dword   r3;
+        dword   r4;
+        dword   r5;
+        dword   r6;
+        dword   r7;
+        dword   r8;
+        dword   r9;
+        dword   r10;
+        dword   r11;
+        dword   r12;
+        dword   r13;        // instruction pointer, alias "pc"
+        dword   r14;
+        dword   r15;        // stack pointer, alias "sp"
+        dword   flags;      // bit 0: ZF; bit 1: CF; bit 2: set if program is still running
+    };
+
+The second object, which I'll call an Image object, holds the necessary information about an xvm
+program that has been loaded into memory.
+
+    struct Image
+    {
+        FileHeader  *hdr;       // holds the data in the xvm file header
+        Symbol      *symbols;   // linked list, each entry containing metadata about a symbol
+        Section     *sections;  // linked list, each entry containing metadata about a section
+        FILE        *fp;        // for reading from the underlying xvm file
+    };
+
+After allocating and initializing these objects to their default states, main calls the function at
+address 0x10422f, which is responsible for loading a supplied xvm file into memory so it can be run.
+It begins by reading a 0x14-byte header at the start of the xvm file:
+
+    struct FileHeader
+    {
+        dword   signature;      // must be 0x36d7678
+        dword   entry;          // address of the first instruction to execute
+        dword   nsyms;          // number of symbols
+        dword   ?????;          // this data is never used
+        dword   nsecs;          // number of sections
+    };
+
+Immediately following the file header comes the symbol information for the file. Assuming nsyms > 0,
+this is an array consisting of nsyms elements of the form:
+
+    struct SymbolTableEntry
+    {
+        dword   name_addr;      // address of a string containing the name of the symbol
+        dword   data_addr;      // location of the symbol
+    };
+
+After the symbol table comes the section table, containing nsecs entries, each of which has a
+slightly more complicated form:
+
+    struct SectionTableEntry
+    {
+        dword   signature;      // must be 0xdeadbeef
+        char[]  name;           // variable length, null terminated
+        dword   vsize;          // size of the section when loaded in memory
+        dword   vaddr;          // address of the section when loaded in memory
+        dword   prot;           // permissions (read, write, execute) for the section
+        dword   rsize;          // size of the section within the file
+        byte[]  contents;       // variable length, the actual contents of the section
+    };
+
+Using the section table entries, the function 0x10422f loads the various sections into memory and
+populates the Image object described above.
+
+During my analysis, I wrote a small python module XvmProgram.py, attached to this solution, which
+parses and gathers metadata for xvm files. As a first step to analyzing pyaz.xvm, we can use this
+module to write a simple script that logs section/symbol information.
+
+
+pyazdump.py, version 1
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    
+    #!/usr/bin/env python3
+    
+    import XvmProgram
+
+    # read and parse the program 
+    prog = XvmProgram.XvmProgram('pyaz.xvm')
+
+    # log basic info (number of sections, symbols, etc.)
+    print("\n===[ SUMMARY ]===\n")
+    prog.PrintSummary()
+
+    # log section header data
+    print("\n===[ SECTIONS ]===\n")
+    prog.PrintSections()
+
+    # log name and location of any symbols
+    if prog.Symbols:
+        print("\n===[ SYMBOLS ]===\n")
+        prog.PrintSymbols()
+            
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+Running this script gives the following output.
+
+    $ python3 pyazdump.py 
+    
+    ===[ SUMMARY ]===
+
+    Sections: 14
+    Symbols:  0
+    Entry:    0x13371000
+
+    ===[ SECTIONS ]===
+
+    Name         VAddr         VSize      RAddr      RSize      Protect
+    .text        0x13371000    0x1000     0x2e       0x72c      RX
+    .data        0x1337f000    0x1000     0x774      0x760      RW
+    .chk0        0x31337000    0x1000     0xeee      0xe5a      RWX
+    .chk2        0x31339000    0x1000     0x1d62     0xe3b      RWX
+    .chk4        0x3133b000    0x1000     0x2bb7     0xe5e      RWX
+    .chk6        0x3133d000    0x1000     0x3a2f     0xe50      RWX
+    .chk8        0x3133f000    0x1000     0x4899     0xe61      RWX
+    .chk10       0x31341000    0x1000     0x5715     0xe6f      RWX
+    .chk11       0x31342000    0x1000     0x659f     0x38f      RWX
+    .chk1        0x31338000    0x1000     0x6948     0xe64      RWX
+    .chk3        0x3133a000    0x1000     0x77c6     0xe42      RWX
+    .chk5        0x3133c000    0x1000     0x8622     0xe61      RWX
+    .chk7        0x3133e000    0x1000     0x949d     0xe4c      RWX
+    .chk9        0x31340000    0x1000     0xa303     0xe6c      RWX
+
+Of course, the interesting thing in this data are all the ".chk" sections, which are RWX. This tells
+us we should expect the .chk sections to contain code that either modifies itself, or is modified by
+some other code.
+
+
+
+                                      =======================
+                                        2. The XVM bytecode
+                                      =======================
+
+After the image is loaded into memory, the main function creates a stack section for the program,
+sets the program counter to the entry address, and kicks off the program. To be precise, main calls
+the function at 0x101997, containing a simple while loop that decodes and executes instructions
+until a certain bit of the flags register is cleared. The routine that actually carries out the
+instruction execution is at 0x101f5e. By understanding this routine, we learn the structure of XVM
+bytecode:
+
+    +---------------- +--------------------------+-----------------------+-----------------------+
+    | opcode (1 byte) | addressing mode (1 byte) | operand 1 (0-5 bytes) | operand 2 (0-5 bytes) |
+    +-----------------+--------------------------+-----------------------+-----------------------+
+
+All bytecode instructions are at least 2 bytes long, since both opcode and addressing mode are
+required. Instructions may have either 0, 1, or 2 operands, which must have one of the following
+forms:
+
+    OPERAND         ENCODING
+    register        one byte, specifying which register
+    immediate       four byte little-endian dword
+    [reg.+imm.]     one byte specifying register, followed by four bytes specifying immediate
+
+The addressing mode byte tells which operands are present, and which encoding to use for each
+operand. There are remarkably few rules limiting what addressing modes are allowed. Basically, you
+can't have an operand 2 without also having an operand 1, which seems logical enough. Beyond that,
+however, it's really the wild west. For example, there is no rule against both operands being
+immediates, so you can encode an instruction that looks like:
+
+    mov     1, 2
+
+This strange-looking instruction doesn't do anything you would expect it to: it actually overwrites
+part of the instruction being executed (even in so-called RX sections)! Weird. It's probably a bug,
+but let's call it a feature.
+
+In any case, the mapping between opcodes and mnemonics is pretty easy to work out, so writing a
+disassembler for XVM bytecode shouldn't be too difficult. As part of my analysis, I wrote a python
+module XvmDisassemble.py, attached to this solution, that is responsible for doing exactly that.
+Using it, we can modify the pyazdump.py script so that it writes the disassembled code to disk.
+
+
+pyazdump.py, version 2
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        
+    #!/usr/bin/env python3
+    
+    import XvmProgram
+    import XvmDisassemble
+    
+    # read and parse the program 
+    prog = XvmProgram.XvmProgram('pyaz.xvm')
+    
+    # analyze and disassemble the program
+    lines = XvmDisassemble.Analyze(prog)
+    
+    # write the diassembled code to file
+    asmfile = 'pyaz.asm'
+    sortedlines = tuple((a, lines[a]) for a in sorted(lines.keys()))
+    with open('pyaz.asm', 'w') as f:
+        for a,l in sortedlines:
+            f.write('{:<12s}{:s}\n'.format(hex(a), l))
+    print(f"\nDisassembled code written to {asmfile}")
+    
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+After running this script, the disassembled code, contained in file pyaz.asm, is small and easy to
+read (I've put an annotated version, with my comments, below).
+
+
+pyaz.asm, version 1
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        
+    #   Entry
+
+    0x13371000  call    0x13371043                  # Main
+    0x13371006  hlt
+
+
+    #   XorCrypt 
+    #   Xors over a page of memory with a repeated 0x20-byte key. 
+    #                                                            
+    #   param   r1      base address of the page being modified 
+    #   param   r2      base address of the 0x20-byte key      
+
+    0x13371008  xor     r3, r3
+    0x1337100c  mov     r6, r1
+    0x13371010  add     r6, r3
+    0x13371014  mov     r7, r3
+    0x13371018  div     r7, 0x20
+    0x1337101f  mov     r7, r5
+    0x13371023  add     r7, r2
+    0x13371027  xor     byte [r6], byte [r7]
+    0x1337102b  inc     r3
+    0x1337102e  cmp     r3, 0x1000
+    0x13371035  je      0x13371041
+    0x1337103b  jmp     0x1337100c
+    0x13371041  ret
+
+
+    #   Main 
+
+    0x13371043  push    r14
+    0x13371046  mov     r14, sp
+    0x1337104a  sub     sp, 0x8
+    0x13371051  mov     dword [r14-0x4], 0x0
+    0x1337105c  mov     dword [r14-0x8], 0x0
+    0x13371067  mov     r1, 0x1337f15a              # "Enter Password: "
+    0x1337106e  call    0x1337118f                  # Print
+    0x13371074  mov     r1, 0x1337f03a              # password base
+    0x1337107b  mov     r2, 0xff
+    0x13371082  call    0x13371248                  # Input
+    0x13371088  cmp     dword [r14-0x4], 0x168
+    0x13371093  jae     0x13371151
+    0x13371099  mov     r0, dword [r14-0x4]
+    0x133710a1  and     r0, 0x1f
+    0x133710a8  cmp     r0, 0x0
+    0x133710af  jne     0x1337110d
+    0x133710b5  mov     r0, dword [r14-0x4]         # once every 32 iterations, decrypt next chk page
+    0x133710bd  shr     r0, 0x5
+    0x133710c4  shl     r0, 0xc
+    0x133710cb  mov     r4, r0
+    0x133710cf  mov     r5, 0x31337000
+    0x133710d6  add     r5, r4
+    0x133710da  mov     r0, dword [r14-0x4]
+    0x133710e2  shr     r0, 0x5
+    0x133710e9  mov     r4, r0
+    0x133710ed  mov     r2, 0x1337f72c              # key table
+    0x133710f4  mul     r4, 0x4
+    0x133710fb  add     r2, r4
+    0x133710ff  mov     r2, dword [r2]
+    0x13371103  mov     r1, r5
+    0x13371107  call    0x13371008                  # XorCrypt
+    0x1337110d  mov     r1, 0x1337f03a              # password base
+    0x13371114  mov     r0, dword [r14-0x4]
+    0x1337111c  mov     r4, 0x1337f18c              # check function table
+    0x13371123  mul     r0, 0x4
+    0x1337112a  add     r4, r0
+    0x1337112e  call    dword [r4]                  # call check function
+    0x13371131  dec     r0                          # need return to be 1 to have correct password
+    0x13371134  or      r0, dword [r14-0x8]
+    0x1337113c  mov     dword [r14-0x8], r0
+    0x13371144  inc     dword [r14-0x4]
+    0x1337114b  jmp     0x13371088
+    0x13371151  cmp     dword [r14-0x8], 0x0        # We need this to be 0 to have correct password
+    0x1337115c  jne     0x13371175
+    0x13371162  mov     r1, 0x1337f13a              # "Correct Password"
+    0x13371169  call    0x133711ba                  # PrintLine
+    0x1337116f  jmp     0x13371182
+    0x13371175  mov     r1, 0x1337f14b              # "Wrong Password"
+    0x1337117c  call    0x133711ba                  # PrintLine
+    0x13371182  xor     r0, r0
+    0x13371186  mov     sp, r14
+    0x1337118a  pop     r14
+    0x1337118d  ret
+
+
+    #   Print
+    #   Prints a string to stdout, without appending a newline.
+    #                                                         
+    #   param   r1      base address of string to print      
+
+    0x1337118f  push    r14
+    0x13371192  mov     r14, sp
+    0x13371196  call    0x133712de                  # Strlen
+    0x1337119c  mov     r2, r1
+    0x133711a0  mov     r5, r0
+    0x133711a4  mov     r1, 0x1
+    0x133711ab  call    0x1337122f                  # Write
+    0x133711b1  mov     sp, r14
+    0x133711b5  pop     r14
+    0x133711b8  ret
+
+
+    #   PrintLine
+    #   Prints a string to stdout, followed by a newline character. 
+    #                                                              
+    #   param   r1      base address of string to print           
+
+    0x133711ba  push    r14
+    0x133711bd  mov     r14, sp
+    0x133711c1  sub     sp, 0x4
+    0x133711c8  mov     dword [r14-0x4], 0xa
+    0x133711d3  call    0x133712de                  # Strlen
+    0x133711d9  mov     r5, r0
+    0x133711dd  mov     r2, r1
+    0x133711e1  mov     r1, 0x1
+    0x133711e8  call    0x1337122f                  # Write
+    0x133711ee  mov     r5, 0x1
+    0x133711f5  mov     r2, r14
+    0x133711f9  sub     r2, 0x4
+    0x13371200  mov     r1, 0x1
+    0x13371207  call    0x1337122f                  # Write
+    0x1337120d  mov     sp, r14
+    0x13371211  pop     r14
+    0x13371214  ret
+
+
+    #   Write           
+    #   Writes a buffer to a specified file descriptor.   
+    #                                                    
+    #   param   r1      file descriptor to write to             
+    #   param   r2      base address of buffer to write        
+    #   param   r5      number of bytes to write              
+
+    0x1337122f  push    r14
+    0x13371232  mov     r14, sp
+    0x13371236  mov     r0, 0x1                     # syscall write
+    0x1337123d  syscall
+    0x1337123f  mov     sp, r14
+    0x13371243  pop     r14
+    0x13371246  ret
+
+
+    #   Input       
+    #   Obtains user input from stdin.   
+    #                                    
+    #   param   r1      address of buffer that receives input  
+    #   param   r2      number of bytes to read               
+
+    0x13371248  push    r14
+    0x1337124b  mov     r14, sp
+    0x1337124f  mov     r5, r2
+    0x13371253  mov     r2, r1
+    0x13371257  mov     r1, 0x0
+    0x1337125e  mov     r0, 0x0                     # syscall read
+    0x13371265  syscall
+    0x13371267  mov     sp, r14
+    0x1337126b  pop     r14
+    0x1337126e  ret
+
+
+    #   Strlen                                     
+    #   Computes the length of the given string.  
+    #                                            
+    #   param   r1      base address of string  
+    #   return  r0      length of string       
+
+    0x133712de  xor     r2, r2
+    0x133712e2  mov     r2b, byte [r1]
+    0x133712e6  test    r2, r2
+    0x133712ea  je      0x1337131d
+    0x133712f0  mov     r0, 0x1
+    0x133712f7  mov     r8, r0
+    0x133712fb  inc     r0
+    0x133712fe  mov     r4, r1
+    0x13371302  add     r4, r0
+    0x13371306  dec     r4
+    0x13371309  mov     r2b, byte [r4]
+    0x1337130d  test    r2, r2
+    0x13371311  jne     0x133712f7
+    0x13371317  mov     r0, r8
+    0x1337131b  ret
+    0x1337131d  xor     r8, r8
+    0x13371321  mov     r0, r8
+    0x13371325  ret
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+                                    ==========================
+                                      3. The password checks
+                                    ==========================
+
+One thing we observe immediately in the assembly is that only instructions from the .text section
+were found. Earlier, we were expecting to see code in the .chk sections as well, so this may be
+somewhat surprising. On closer examination, however, we see the instruction
+
+    0x1337112e  call    dword [r4] 
+
+provides an avenue for .chk code to be called (if r4 contains a .chk section address). Indeed, we
+will see that this is exactly what happens.
+
+Stepping through the "Main" function assembly, it first prompts the user for a password before
+beginning a loop with 0x168=360 iterations. In each iteration, r4 gets loaded with a new address
+from a function table before being called:
+
+    0x13371114  mov     r0, dword [r14-0x4]         # loop counter value
+    0x1337111c  mov     r4, 0x1337f18c              # function table base
+    0x13371123  mul     r0, 0x4
+    0x1337112a  add     r4, r0                      # point to current entry in the function table
+    0x1337112e  call    dword [r4]                  # call current entry in the function table
+
+If you look at this function table, you'll see that each of its functions appear to reside in one of
+the .chk sections. The first few entries, for example, are
+
+    0x31337000, 0x31337073, 0x313370e6, 0x31337159, 0x313371cc, ...
+
+We conclude that 360 different checks are performed on whatever password the user supplies,
+corresponding to the functions in this table. In order to deduce the correct password, we need to
+disassemble and understand these 360 checks.
+
+Before being able to disassemble them, however, the .chk sections must be decrypted! Indeed, before
+the check functions are called, each .chk section is modified by xoring on a (repeated) 0x20-byte
+key:
+
+    0x133710e9  mov     r4, r0                      # key table index
+    0x133710ed  mov     r2, 0x1337f72c              # base of key table
+    0x133710f4  mul     r4, 0x4
+    0x133710fb  add     r2, r4                      
+    0x133710ff  mov     r2, dword [r2]              # points to key to use when decrypting
+    0x13371103  mov     r1, r5                      # base of the .chk section being decrypted
+    0x13371107  call    0x13371008                  # XorCrypt
+
+All of these operations are trivial to add to our pyazdump.py script, so it will be no problem to
+disassemble all the checks!
+
+
+pyazdump.py, version 3
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        
+#!/usr/bin/env python3
+
+import XvmProgram
+import XvmDisassemble
+import struct
+
+# read and parse the xvm program 
+prog = XvmProgram.XvmProgram('pyaz.xvm')
+
+# Manually decrypt .chk sections
+for i in range(0, 360, 32):
+    chkaddr = 0x31337000 + 0x1000*(i // 32)
+    keytbl  = 0x1337f72c + 4*(i // 32)
+    keyaddr = struct.unpack_from('<I', prog.Binary, prog.AddressToOffset(keytbl))[0]
+    keyoff  = prog.AddressToOffset(keyaddr)
+    for s in prog.Sections:
+        if s.VAddr == chkaddr:
+            for i in range(s.RSize):
+                prog.Binary[s.RAddr+i] ^= prog.Binary[keyoff + (i % 32)]
+
+# Grab check function addresses from function table for disassembly
+checkfunctiontable = prog.AddressToOffset(0x1337f18c)
+checkfunctions = struct.unpack_from('<' + 'I'*360, prog.Binary, checkfunctiontable)
+
+# analyze and disassemble the program
+lines = XvmDisassemble.Analyze(prog, additional=checkfunctions)
+
+# write the diassembled code
+asmfile = 'pyaz.asm'
+sortedlines = tuple((a, lines[a]) for a in sorted(lines.keys()))
+with open('pyaz.asm', 'w') as f:
+    for a,l in sortedlines:
+        if a in checkfunctions:
+            i = checkfunctions.index(a)
+            f.write(f"Check_{i}:\n")
+        f.write('{:<12s}{:s}\n'.format(hex(a), l))
+
+print(f"\nDisassembled code written to {asmfile}")
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+I certainly won't print the entirety of the dump here, because it's quite long now. After all, 360
+functions is a lot of functions. Luckily for us, they aren't all that different from each other. In
+fact, there are essentially two different flavors of check function that appear, the 16-line version
+and the 17-line version.
+
+16-line version:
+
+	0x3133723f  push    r14
+	0x31337242  mov     r14, sp
+	0x31337246  mov     dword [r14-0x10], r1
+	0x3133724e  mov     r0, dword [r14-0x10]
+	0x31337256  mov     r4b, byte [r0+0x22]
+	0x3133725e  mov     byte [r14-0x11], r4b
+	0x31337266  mov     r5b, byte [r14-0x11]
+	0x3133726e  and     r5, 0x4
+	0x31337275  cmp     r5, 0x0
+	0x3133727c  je      0x31337293
+	0x31337282  mov     dword [r14-0x4], 0x1
+	0x3133728d  jmp     0x3133729e
+	0x31337293  mov     dword [r14-0x4], 0x0
+	0x3133729e  mov     r0, dword [r14-0x4]
+	0x313372a6  pop     r14
+	0x313372a9  ret
+
+17-line version:
+
+	0x31337000  push    r14  
+	0x31337003  mov     r14, sp
+	0x31337007  mov     dword [r14-0x10], r1
+	0x3133700f  mov     r0, dword [r14-0x10]
+	0x31337017  mov     r4b, byte [r0+0x29]
+	0x3133701f  mov     byte [r14-0x11], r4b
+	0x31337027  mov     r5b, byte [r14-0x11]
+	0x3133702f  shr     r5, 0x6
+	0x31337036  and     r5, 0x1
+	0x3133703d  cmp     r5, 0x0
+	0x31337044  jne     0x3133705b
+	0x3133704a  mov     dword [r14-0x4], 0x1
+	0x31337055  jmp     0x31337066
+	0x3133705b  mov     dword [r14-0x4], 0x0
+	0x31337066  mov     r0, dword [r14-0x4]
+	0x3133706e  pop     r14  
+	0x31337071  ret
+
+Both versions perform the exact same task: they check if a certain bit in the password is set, and
+return either 1 or 0 depending on the result. We want each of the check functions to return 1, so to
+figure out the right password all we must do is (a) figure out which bit each check function is
+testing, and (b) determine which value (0 or 1) is the correct one. It's not too hard to write a
+script that does exactly this, based on the disassembled code.
+
+
+keygen.py
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        
+#!/usr/bin/env python3
+
+import XvmProgram
+import XvmDisassemble
+import struct
+
+# read and parse the xvm program 
+prog = XvmProgram.XvmProgram('pyaz.xvm')
+
+# Manually decrypt .chk sections
+for i in range(0, 360, 32):
+    chkaddr = 0x31337000 + 0x1000*(i // 32)
+    keytbl  = 0x1337f72c + 4*(i // 32)
+    keyaddr = struct.unpack_from('<I', prog.Binary, prog.AddressToOffset(keytbl))[0]
+    keyoff  = prog.AddressToOffset(keyaddr)
+    for s in prog.Sections:
+        if s.VAddr == chkaddr:
+            for i in range(s.RSize):
+                prog.Binary[s.RAddr+i] ^= prog.Binary[keyoff + (i % 32)]
+
+# Grab check function addresses from function table for disassembly
+checkfunctiontable = prog.AddressToOffset(0x1337f18c)
+checkfunctions = struct.unpack_from('<' + 'I'*360, prog.Binary, checkfunctiontable)
+
+# Compute password
+sortedlines = tuple((a, lines[a]) for a in sorted(lines.keys()))
+password = bytearray(0xff)
+for i,l in enumerate(sortedlines):
+    if l[0] not in checkfunctions:
+        continue
+
+    # which byte is being tested
+    pos = 0
+    ind = sortedlines[i+4][1].find('0x')
+    if ind >= 0:
+        end = sortedlines[i+4][1].find(']', ind)
+        pos = int(sortedlines[i+4][1][ind:end], 16)
+
+    if sortedlines[i+15][1] == 'ret':
+        # Here if this is the 16-line version
+        ind = sortedlines[i+7][1].find('0x')
+        mask = int(sortedlines[i+7][1][ind:], 16)
+        caseA = sortedlines[i+10][1][-1]
+        if caseA == '1' and sortedlines[i+9][1].startswith('je'):
+            password[pos] |= mask
+        if caseA == '0' and sortedlines[i+9][1].startswith('jne'):
+            password[pos] |= mask
+    else:
+        # Here if this is the 17-line version
+        ind = sortedlines[i+7][1].find('0x')
+        mask = 1 << int(sortedlines[i+7][1][ind:], 16)
+        test = sortedlines[i+9][1][-1]
+        caseA = sortedlines[i+11][1][-1]
+        if caseA == '1' and test == '0' and sortedlines[i+10][1].startswith('je'):
+            password[pos] |= mask
+        if caseA == '1' and test == '1' and sortedlines[i+10][1].startswith('jne'):
+            password[pos] |= mask
+        if caseA == '0' and test == '0' and sortedlines[i+10][1].startswith('jne'):
+            password[pos] |= mask
+        if caseA == '0' and test == '1' and sortedlines[i+10][1].startswith('je'):
+            password[pos] |= mask
+
+print(password.rstrip(b'\x00').decode('utf-8'))
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+        
+
+Running our script, we see the correct password is:
+
+    $ python3 keygen.py
+    zh3r0{s0_m4ny_t34rS_wh1Le_P33l1ng_tH1s_On10n}
+
+    $ ./xvm pyaz.xvm
+    Enter Password: zh3r0{s0_m4ny_t34rS_wh1Le_P33l1ng_tH1s_On10n}
+    Correct Password
+
+Also, since there is no length check, you can make lots of correct passwords simply by appending
+garbage to the correct password:
+
+    $ ./xvm pyaz.xvm
+    Enter Password: zh3r0{s0_m4ny_t34rS_wh1Le_P33l1ng_tH1s_On10n}_____o_0
+    Correct Password
+
