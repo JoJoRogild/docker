@@ -1,0 +1,51 @@
+jeg bliver hvis nød til at hacke den her i hånden
+rbp - 0x38 = input
+rbp - 0x40 = length
+rbp - 0x12 = 0xfbe0bce158ca53e2
+rbp - 0xa  = 0x95d8d4a7
+rbp - 6    = 0xb283
+rbp - 0x20 = 0x9497e38e34a6368a
+rbp - 0x18 = 0xcabcb8d5
+rbp - 0x14 = 0x80b7
+rbp - 0x2e = 0
+rbp - 0x26 = 0
+rbp - 0x22 = 0
+if(rbp-0x40 == 0xe){
+	rbp - 4 = 0
+	while (rbp - 4 <= 0xd){
+		rdx = input[rbp - 4]
+		eax = [rbp-0x12 + [rbp-4]]
+		xor rdx, eax
+		[rbp + [rbp - 4] - 0x2e] = dl//rdx
+		eax = [rbp + [rbp - 4] - 0x20]
+		if (dl != al){return 0}
+		rbp - 4 = 0 
+	}
+}
+else{
+	return 0
+}
+
+
+
+
+
+e2^x1 = 8a 0x68 h
+53^x2 = 36 0x65 e
+ca^x3 = a6 0x6c l
+58^x4 = 34 0x6c l
+e1^x5 = 8e 0x6f o
+bc^x6 = e3 0x5f _
+e0^x7 = 97 0x77 w
+fb^x8 = 94 0x6f o
+
+a7^x9 = d5      r
+ca^xa = a6		l
+ca^xb = a6		d
+
+95^xc = 0xca    _
+83^xd = b7      4
+b2^xe = 80      2
+
+password = hello_world_42
+length = 0xe
