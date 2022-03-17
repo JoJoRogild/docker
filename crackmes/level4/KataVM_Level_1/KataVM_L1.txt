@@ -1,0 +1,2143 @@
+der et et memcpy i starten 
+og så tror jeg der er nogle header values i første byte men pga jeg kun har en byte kan jeg bare koncentrerer mig om 0xf6
+så efter alt start kode starte min kode der
+0x55989bee72b4-0x55989bee62d3= FE1 lang
+der er 3 functioner 0xd0 0xe0 0x100
+
+d0: er write
+100: er read
+alle ByteRIP er rigtig
+længden skal være 3 tror jeg 
+den tager 4 gange 3 som jo faktisk er 4 i længde fordi der er newline
+nu til at lave alle instructioner
+
+newByte = 0
+ByteRIP = memcpy(bytes, newByte)
+while (true){
+    ByteRIP += 1
+
+    if ([ByteRIP - 1] == 0xaa){
+        ByteRIP = ByteRIP + 1
+        if([ByteRIP-1] & 3 == 0){
+            bliver ikke kaldt
+            rdx += 6
+            
+            dword[rsp + (shr([ByteRIP-1], 4) & 3)*4]  = dword[rsp + (shr([ByteRIP-1], 4) & 3)*4] - dword[rsp - (shr([ByteRIP-1], 6) & 3)*4]
+        }
+        else if ([ByteRIP-1] & 3 != 2){
+            ret
+        }
+        else{
+            [rsp + (shr([ByteRIP-1] & 3) & 3) * 4 ] = [rsp + (shr([ByteRIP-1], 4) & 3) * 4 ] - [ByteRIP]//4 bytes from ByteRIP
+            ByteRIP = ByteRIP + 6
+            
+            //this is minus instruction written as
+            aa06
+            aa for instrution 06 for mode eller stack idk og så 4 bytes du skal minus
+            fx: aa06 29d3 ace7 
+        }
+    }
+    else if ([ByteRIP-1] > 0xaa){
+
+
+
+
+
+
+
+
+//here we go
+
+
+
+
+
+
+
+
+        if ([ByteRIP-1] == 0xd5){
+            ByteRIP += 1
+            if([ByteRIP - 1] & 3 == 2){
+                //bliver kaldt
+            }
+            else if ([ByteRIP - 1] & 3 == 3){
+                r8 = dword[ByteRIP]//4 bytes
+                eax = shl(((not r8) & 7), 2)
+                rsi = rsp + eax
+
+                if(rsp + eax <= rsp){
+                    rax = *var6//rsp+0x1c
+                    esi = 8 - (dword[ByteRIP] & 7)
+                    rdi = rsp + (8 - (dword[ByteRIP] & 7))*4
+                    if (rdi > rax){
+
+                    }
+                    else{
+                        
+
+                    }
+                }
+
+            }
+            else{
+                //bliver ikke kaldt
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+        else if ([ByteRIP-1] < 0xd5){
+            if ([ByteRIP-1] == 0xb1){
+                ByteRIP += 1
+                if([ByteRIP - 1] & 3 == 0){
+
+                }
+                else if([ByteRIP - 1] & 3 == 2){
+                    [rsp + (shr([ByteRIP - 1], 4) & 3)*4] = shr([rsp + (shr([ByteRIP - 1], 4) & 3)*4], ByteRIP)
+                    ByteRIP += 4 //der bliver pluset 6 i alt 
+                }
+                else {
+                    return
+                }
+            }
+            else if ([ByteRIP-1] != 0xc3){
+                ret
+            }
+            else{
+                hack this one next
+                ByteRIP += 1
+                if([ByteRip - 1] & 3 == 0){
+
+                }
+                else if([ByteRip - 1] & 3 == 2){
+                    rax = shr([ByteRip - 1], 4) & 3
+                    edi = dword[ByteRIP]
+                    if([rsp + (shr([ByteRip - 1], 4) & 3)*4] == dword[ByteRIP]){
+                        r12d = 0
+                    }
+                    else{
+                        r12d = 1
+                    }
+                    ByteRIP += 5//7 i alt
+                    //jeg tror det her er cmp instruction
+                }  
+                else{
+                    return
+                }
+            }
+        }
+        else if ([ByteRIP-1] == 0xef){
+            ByteRIP = ByteRIP + 1
+            if([ByteRIP - 1] & 3 == 2){
+                //bliver ikke kaldt
+            }
+            else if ([ByteRIP - 1] & 3 == 3){
+                //bliver ikke kaldt
+            }
+            else if ([ByteRIP - 1] & 3 == 1){
+                //print one char
+                if (write([stack + shr([ByteRIP - 1], 6)*4]) == 1){
+                    ByteRIP = ByteRIP + 2
+                }
+                else{
+                    ByteRIP = ByteRIP + 2
+                    [ByteRIP] = 00
+                    //chrash here i think   
+                }
+            }
+            else{
+                //bliver ikke kaldt
+            }
+        }
+        else if ([ByteRIP-1] != 0xf6){
+            ret
+        }
+        else{
+            ByteRIP = ByteRIP + 1//plz check alle dem her med 2 jeg tror det er en
+            if ([ByteRIP - 1] & 3 == 0){
+                [rsp + (shr([ByteRIP - 1], 4) & 3)*4] = [rsp + (ecx = shr([ByteRIP - 1], 6) & 3)*4]
+                ByteRIP += 5
+
+            }
+            else if ([ByteRIP - 1] & 3  != 2){
+                ret
+            }
+            else{
+                [stack + ([ByteRIP - 1] & 3)*4] = [BytesRIP] //4 bytes]
+                BytesRIP = BytesRIP + 4
+                //push kind of thing
+            }
+        }
+    }
+    else if ([ByteRIP-1] == 0x5d]){
+        ByteRIP = ByteRIP + 1
+        eax = [ByteRIP - 1]
+        if ([ByteRIP - 1] & 3 == 0){
+            ByteRIP = ByteRIP + 1
+
+            if (read(0, [rsp + (shr([ByteRIP - 1], 4)&3)*4 ],  [rsp + (shr([ByteRIP - 1], 6) & 3)*4 ]) != [rsp + (shr([ByteRIP - 1], 6) & 3)*4 ]){return}
+            
+            read(syscall, buffer, length)
+        }
+        else if ([ByteRIP - 1] & 3 != 2){
+            ret
+        }
+        else {
+            //bliver ikke kaldt
+        }
+    }
+    else if ([ByteRIP-1] > 0x5d){
+        if ([ByteRIP-1] == 0x7c){
+            ByteRIP = ByteRIP + 1
+            if ([ByteRIP - 1] & 3 == 0 ){
+                //bliver ikke kaldt
+            }
+            else if ([ByteRIP - 1] & 3 != 2){return}
+            else{
+                shl([rsp + (shr([ByteRIP - 1], 4) & 3)*4], [ByteRIP])
+                ByteRIP = ByteRIP + 5
+            }        
+        }
+        else if ([ByteRIP-1] != 0x8b){
+            ret
+        }
+        else{
+            ByteRIP = ByteRIP + 1
+            if([ByteRIP - 1] & 3 == 0){
+                [rsp + (shr([ByteRIP - 1], 4) & 3)*4 ] = [rsp + (shr([ByteRIP - 1], 4) & 3)*4] ^ [rsp + (shr([ByteRIP - 1], 6) & 3)*4 ]
+                ByteRIP = ByteRIP + 1
+            }
+            else if ([ByteRIP - 1] & 3 != 2){return}
+            else{
+                [rsp + (shr([ByteRIP - 1], 4) & 3)*4]  = [(shr([ByteRIP - 1], 4) & 3)*4] ^ [ByteRIP]
+                ByteRIP = ByteRIP + 4
+            }
+        }
+    }
+
+
+
+    else if ([ByteRIP-1] == 0x3e]){
+        //bliver ikke kaldt
+    }
+    else if ([ByteRIP-1] != 0x4a){
+        if ([ByteRIP-1] != 0x1e){
+            return
+        }
+        else{
+            xmm0 = [rsp]//16 bytes
+            xmm6 = [rsp+0x10]//16 bytes
+            [rsp] = xmm6
+            [rsp+0x10] = xmm0
+
+
+            ByteRIP = ByteRIP + 1
+            xmm0 = [rsp]alt er lig med
+            xmm6 = [rsp + 0x10]
+            [rsp] = xmm6
+            [rsp + 0x10] = xmm0
+            if ([ByteRIP - 1] & 3 == 2){
+                ByteRIP = ByteRIP + 7
+            }
+            else if ([ByteRIP - 1] & 3 == 3){
+                ByteRIP = ByteRIP + 8
+            }
+            else {
+                if ([ByteRIP - 1] == 1){
+                    ByteRIP = ByteRIP + 5
+                }
+            }
+        }
+    }
+    else{
+        ByteRIP = ByteRIP + 1
+        if ([ByteRIP - 1] & 3 == 0){
+            [rsp + (shr([ByteRIP - 1], 4) & 3)*4 ] += [rsp + (shr([ByteRIP - 1], 6) & 3)*4 ]//læser 4 bytes
+        }
+        else if ([ByteRIP - 1] & 3 != 2){
+            return
+        }
+        else{
+            [rsp + (shr([ByteRIP - 1], 4) & 3)*4 ] += næste 4 bytes fra ByteRIP
+            ByteRIP = ByteRIP + 5
+        }
+    }
+}
+
+
+
+
+those i missed
+ f6 & 3 == 0
+
+
+
+                             FUN_001012d0                                    XREF[1]:     00101178(c)  
+        001012d0 f3 0f 1e fa     ENDBR64
+        001012d4 41 54           PUSH       R12
+        001012d6 55              PUSH       RBP
+        001012d7 53              PUSH       RBX
+        001012d8 48 81 ec        SUB        RSP,0x1000
+                 00 10 00 00
+        001012df 48 83 0c        OR         qword ptr [RSP]=>local_1018,0x0
+                 24 00
+        001012e4 48 81 ec        SUB        RSP,0x1000
+                 00 10 00 00
+        001012eb 48 83 0c        OR         qword ptr [RSP]=>local_2018,0x0
+                 24 00
+        001012f0 48 81 ec        SUB        RSP,0x1000
+                 00 10 00 00
+        001012f7 48 83 0c        OR         qword ptr [RSP]=>local_3018,0x0
+                 24 00
+        001012fc 48 81 ec        SUB        RSP,0xb60
+                 60 0b 00 00
+        00101303 ba 1a 3b        MOV        EDX,0x3b1a
+                 00 00
+        00101308 48 8d 35        LEA        RSI,[ByteCode]                                   = F6h
+                 f9 1c 00 00
+        0010130f 45 31 e4        XOR        R12D,R12D
+        00101312 64 48 8b        MOV        RAX,qword ptr FS:[0x28]
+                 04 25 28 
+                 00 00 00
+        0010131b 48 89 84        MOV        qword ptr [RSP + stackCookie],RAX
+                 24 58 3b 
+                 00 00
+        00101323 31 c0           XOR        EAX,EAX
+        00101325 48 8d 4c        LEA        RCX=>local_3b48,[RSP + 0x30]
+                 24 30
+        0010132a 48 89 e3        MOV        RBX,RSP
+        0010132d 48 89 cf        MOV        RDI,RCX
+        00101330 e8 eb fd        CALL       <EXTERNAL>::memcpy                               void * memcpy(void * __dest, voi
+                 ff ff
+        00101335 66 0f ef c0     PXOR       XMM0,XMM0
+        00101339 0f 29 04 24     MOVAPS     xmmword ptr [RSP]=>local_3b78,XMM0
+        0010133d 48 89 c2        MOV        RDX,RAX
+        00101340 0f 29 44        MOVAPS     xmmword ptr [RSP + local_3b68[0]],XMM0
+                 24 10
+                             LAB_00101345                                    XREF[27]:    001013ab(j), 001013ff(j), 
+                                                                                          001014a4(j), 001014f0(j), 
+                                                                                          00101536(j), 00101591(j), 
+                                                                                          001015b8(j), 001015d7(j), 
+                                                                                          001015f8(j), 00101805(j), 
+                                                                                          00101a45(j), 00101a82(j), 
+                                                                                          00101af0(j), 00101afd(j), 
+                                                                                          00101b3a(j), 00101b9d(j), 
+                                                                                          00101bd8(j), 00101bf8(j), 
+                                                                                          00101c18(j), 00101c3a(j), [more]
+        00101345 48 8d 42 01     LEA        RAX,[RDX + 0x1]
+        00101349 48 89 44        MOV        qword ptr [RSP + ByteRIP],RAX
+                 24 20
+        0010134e 0f b6 02        MOVZX      EAX,byte ptr [RDX]
+        00101351 3c aa           CMP        AL,0xaa
+        00101353 0f 84 17        JZ         LAB_00101470
+                 01 00 00
+                             LAB_00101359                                    XREF[1]:     00101460(j)  
+        00101359 77 55           JA         LAB_001013b0
+        0010135b 3c 5d           CMP        AL,0x5d
+        0010135d 0f 84 dd        JZ         LAB_00101b40
+                 07 00 00
+        00101363 0f 87 47        JA         LAB_001014b0
+                 01 00 00
+        00101369 3c 3e           CMP        AL,0x3e
+        0010136b 0f 84 37        JZ         LAB_00101ba8
+                 08 00 00
+        00101371 3c 4a           CMP        AL,0x4a
+        00101373 0f 85 8f        JNZ        LAB_00101408
+                 00 00 00
+        00101379 48 8d 4a 02     LEA        RCX,[RDX + 0x2]
+        0010137d 48 89 4c        MOV        qword ptr [RSP + ByteRIP],RCX
+                 24 20
+        00101382 0f b6 42 01     MOVZX      EAX,byte ptr [RDX + 0x1]
+        00101386 89 c6           MOV        ESI,EAX
+        00101388 83 e6 03        AND        ESI,0x3
+        0010138b 0f 84 2f        JZ         LAB_001015c0
+                 02 00 00
+        00101391 40 80 fe 02     CMP        SIL,0x2
+        00101395 0f 85 a5        JNZ        LAB_00101540
+                 01 00 00
+        0010139b c0 e8 04        SHR        AL,0x4
+        0010139e 8b 4a 02        MOV        ECX,dword ptr [RDX + 0x2]
+        001013a1 48 83 c2 07     ADD        RDX,0x7
+        001013a5 83 e0 03        AND        EAX,0x3
+        001013a8 01 0c 84        ADD        dword ptr [RSP + RAX*0x4],ECX
+        001013ab eb 98           JMP        LAB_00101345
+        001013ad 0f              ??         0Fh
+        001013ae 1f              ??         1Fh
+        001013af 00              ??         00h
+                             LAB_001013b0                                    XREF[1]:     00101359(j)  
+        001013b0 3c d5           CMP        AL,0xd5
+        001013b2 0f 84 58        JZ         LAB_00101810
+                 04 00 00
+        001013b8 0f 86 3a        JBE        LAB_001014f8
+                 01 00 00
+        001013be 3c ef           CMP        AL,0xef
+        001013c0 0f 84 ca        JZ         LAB_00101a90
+                 06 00 00
+        001013c6 3c f6           CMP        AL,0xf6
+        001013c8 0f 85 72        JNZ        LAB_00101540
+                 01 00 00
+        001013ce 48 8d 42 02     LEA        RAX,[RDX + 0x2]
+        001013d2 48 89 44        MOV        qword ptr [RSP + ByteRIP],RAX
+                 24 20
+        001013d7 0f b6 42 01     MOVZX      EAX,byte ptr [RDX + 0x1]
+        001013db 89 c1           MOV        ECX,EAX
+        001013dd 83 e1 03        AND        ECX,0x3
+        001013e0 0f 84 fa        JZ         LAB_001015e0
+                 01 00 00
+        001013e6 80 f9 02        CMP        CL,0x2
+        001013e9 0f 85 51        JNZ        LAB_00101540
+                 01 00 00
+        001013ef 8b 4a 02        MOV        ECX,dword ptr [RDX + 0x2]
+        001013f2 c0 e8 04        SHR        AL,0x4
+        001013f5 48 83 c2 06     ADD        RDX,0x6
+        001013f9 83 e0 03        AND        EAX,0x3
+        001013fc 89 0c 84        MOV        dword ptr [RSP + RAX*0x4],ECX
+        001013ff e9 41 ff        JMP        LAB_00101345
+                 ff ff
+        00101404 0f              ??         0Fh
+        00101405 1f              ??         1Fh
+        00101406 40              ??         40h    @
+        00101407 00              ??         00h
+                             LAB_00101408                                    XREF[1]:     00101373(j)  
+        00101408 3c 1e           CMP        AL,0x1e
+        0010140a 0f 85 30        JNZ        LAB_00101540
+                 01 00 00
+        00101410 66 0f 6f        MOVDQA     XMM0,xmmword ptr [RSP]=>local_3b78
+                 04 24
+        00101415 66 0f 6f        MOVDQA     XMM6,xmmword ptr [RSP + local_3b68[0]]
+                 74 24 10
+        0010141b 48 8d 42 02     LEA        RAX,[RDX + 0x2]
+        0010141f 48 89 44        MOV        qword ptr [RSP + ByteRIP],RAX
+                 24 20
+        00101424 0f 29 34 24     MOVAPS     xmmword ptr [RSP]=>local_3b78,XMM6
+        00101428 0f 29 44        MOVAPS     xmmword ptr [RSP + local_3b68[0]],XMM0
+                 24 10
+        0010142d 0f b6 42 01     MOVZX      EAX,byte ptr [RDX + 0x1]
+        00101431 83 e0 03        AND        EAX,0x3
+        00101434 3c 02           CMP        AL,0x2
+        00101436 0f 84 c5        JZ         LAB_00101801
+                 03 00 00
+        0010143c 3c 03           CMP        AL,0x3
+        0010143e 0f 84 2c        JZ         LAB_00102170
+                 0d 00 00
+        00101444 48 8d 4a 03     LEA        RCX,[RDX + 0x3]
+        00101448 48 83 c2 08     ADD        RDX,0x8
+        0010144c 3c 01           CMP        AL,0x1
+        0010144e 48 0f 45 d1     CMOVNZ     RDX,RCX
+        00101452 48 8d 42 01     LEA        RAX,[RDX + 0x1]
+        00101456 48 89 44        MOV        qword ptr [RSP + ByteRIP],RAX
+                 24 20
+        0010145b 0f b6 02        MOVZX      EAX,byte ptr [RDX]
+        0010145e 3c aa           CMP        AL,0xaa
+        00101460 0f 85 f3        JNZ        LAB_00101359
+                 fe ff ff
+        00101466 66 2e 0f        NOP        word ptr CS:[RAX + RAX*0x1]
+                 1f 84 00 
+                 00 00 00 00
+                             LAB_00101470                                    XREF[1]:     00101353(j)  
+        00101470 48 8d 42 02     LEA        RAX,[RDX + 0x2]
+        00101474 48 89 44        MOV        qword ptr [RSP + ByteRIP],RAX
+                 24 20
+        00101479 0f b6 42 01     MOVZX      EAX,byte ptr [RDX + 0x1]
+        0010147d 89 c1           MOV        ECX,EAX
+        0010147f 83 e1 03        AND        ECX,0x3
+        00101482 0f 84 b8        JZ         LAB_00101c40
+                 07 00 00
+        00101488 80 f9 02        CMP        CL,0x2
+        0010148b 0f 85 af        JNZ        LAB_00101540
+                 00 00 00
+        00101491 c0 e8 04        SHR        AL,0x4
+        00101494 48 83 c2 08     ADD        RDX,0x8
+        00101498 83 e0 03        AND        EAX,0x3
+        0010149b 8b 0c 84        MOV        ECX,dword ptr [RSP + RAX*0x4]
+        0010149e 2b 4a fa        SUB        ECX,dword ptr [RDX + -0x6]
+        001014a1 89 0c 84        MOV        dword ptr [RSP + RAX*0x4],ECX
+        001014a4 e9 9c fe        JMP        LAB_00101345
+                 ff ff
+        001014a9 0f              ??         0Fh
+        001014aa 1f              ??         1Fh
+        001014ab 80              ??         80h
+        001014ac 00              ??         00h
+        001014ad 00              ??         00h
+        001014ae 00              ??         00h
+        001014af 00              ??         00h
+                             LAB_001014b0                                    XREF[1]:     00101363(j)  
+        001014b0 3c 7c           CMP        AL,0x7c
+        001014b2 0f 84 50        JZ         LAB_00101b08
+                 06 00 00
+        001014b8 3c 8b           CMP        AL,0x8b
+        001014ba 0f 85 80        JNZ        LAB_00101540
+                 00 00 00
+        001014c0 48 8d 42 02     LEA        RAX,[RDX + 0x2]
+        001014c4 48 89 44        MOV        qword ptr [RSP + ByteRIP],RAX
+                 24 20
+        001014c9 0f b6 42 01     MOVZX      EAX,byte ptr [RDX + 0x1]
+        001014cd 89 c1           MOV        ECX,EAX
+        001014cf 83 e1 03        AND        ECX,0x3
+        001014d2 0f 84 c8        JZ         LAB_001015a0
+                 00 00 00
+        001014d8 80 f9 02        CMP        CL,0x2
+        001014db 75 63           JNZ        LAB_00101540
+        001014dd c0 e8 04        SHR        AL,0x4
+        001014e0 48 83 c2 06     ADD        RDX,0x6
+        001014e4 83 e0 03        AND        EAX,0x3
+        001014e7 8b 0c 84        MOV        ECX,dword ptr [RSP + RAX*0x4]
+        001014ea 33 4a fc        XOR        ECX,dword ptr [RDX + -0x4]
+        001014ed 89 0c 84        MOV        dword ptr [RSP + RAX*0x4],ECX
+        001014f0 e9 50 fe        JMP        LAB_00101345
+                 ff ff
+        001014f5 0f              ??         0Fh
+        001014f6 1f              ??         1Fh
+        001014f7 00              ??         00h
+                             LAB_001014f8                                    XREF[1]:     001013b8(j)  
+        001014f8 3c b1           CMP        AL,0xb1
+        001014fa 0f 84 50        JZ         LAB_00101a50
+                 05 00 00
+        00101500 3c c3           CMP        AL,0xc3
+        00101502 75 3c           JNZ        LAB_00101540
+        00101504 48 8d 42 02     LEA        RAX,[RDX + 0x2]
+        00101508 48 89 44        MOV        qword ptr [RSP + ByteRIP],RAX
+                 24 20
+        0010150d 0f b6 42 01     MOVZX      EAX,byte ptr [RDX + 0x1]
+        00101511 89 c1           MOV        ECX,EAX
+        00101513 83 e1 03        AND        ECX,0x3
+        00101516 74 58           JZ         LAB_00101570
+        00101518 80 f9 02        CMP        CL,0x2
+        0010151b 75 23           JNZ        LAB_00101540
+        0010151d c0 e8 04        SHR        AL,0x4
+        00101520 8b 7a 02        MOV        EDI,dword ptr [RDX + 0x2]
+        00101523 83 e0 03        AND        EAX,0x3
+        00101526 39 3c 84        CMP        dword ptr [RSP + RAX*0x4],EDI
+        00101529 b8 01 00        MOV        EAX,0x1
+                 00 00
+        0010152e 44 0f 45 e0     CMOVNZ     R12D,EAX
+        00101532 48 83 c2 07     ADD        RDX,0x7
+        00101536 e9 0a fe        JMP        LAB_00101345
+                 ff ff
+        0010153b 0f              ??         0Fh
+        0010153c 1f              ??         1Fh
+        0010153d 44              ??         44h    D
+        0010153e 00              ??         00h
+        0010153f 00              ??         00h
+                             LAB_00101540                                    XREF[13]:    00101395(j), 001013c8(j), 
+                                                                                          001013e9(j), 0010140a(j), 
+                                                                                          0010148b(j), 001014ba(j), 
+                                                                                          001014db(j), 00101502(j), 
+                                                                                          0010151b(j), 00101a6b(j), 
+                                                                                          00101b23(j), 00101b5b(j), 
+                                                                                          00101bbf(j)  
+        00101540 48 8b 84        MOV        RAX,qword ptr [RSP + stackCookie]
+                 24 58 3b 
+                 00 00
+        00101548 64 48 33        XOR        RAX,qword ptr FS:[0x28]
+                 04 25 28 
+                 00 00 00
+        00101551 0f 85 e5        JNZ        LAB_0010223c
+                 0c 00 00
+        00101557 48 81 c4        ADD        RSP,0x3b60
+                 60 3b 00 00
+        0010155e 44 89 e0        MOV        EAX,R12D
+        00101561 5b              POP        RBX
+        00101562 5d              POP        RBP
+        00101563 41 5c           POP        R12
+        00101565 c3              RET
+        00101566 66              ??         66h    f
+        00101567 2e              ??         2Eh    .
+        00101568 0f              ??         0Fh
+        00101569 1f              ??         1Fh
+        0010156a 84              ??         84h
+        0010156b 00              ??         00h
+        0010156c 00              ??         00h
+        0010156d 00              ??         00h
+        0010156e 00              ??         00h
+        0010156f 00              ??         00h
+                             LAB_00101570                                    XREF[1]:     00101516(j)  
+        00101570 89 c1           MOV        ECX,EAX
+        00101572 c0 e8 06        SHR        AL,0x6
+        00101575 c0 e9 04        SHR        CL,0x4
+        00101578 83 e0 03        AND        EAX,0x3
+        0010157b 83 e1 03        AND        ECX,0x3
+        0010157e 8b 04 84        MOV        EAX,dword ptr [RSP + RAX*0x4]
+        00101581 39 04 8c        CMP        dword ptr [RSP + RCX*0x4],EAX
+        00101584 b8 01 00        MOV        EAX,0x1
+                 00 00
+        00101589 44 0f 45 e0     CMOVNZ     R12D,EAX
+        0010158d 48 83 c2 04     ADD        RDX,0x4
+        00101591 e9 af fd        JMP        LAB_00101345
+                 ff ff
+        00101596 66              ??         66h    f
+        00101597 2e              ??         2Eh    .
+        00101598 0f              ??         0Fh
+        00101599 1f              ??         1Fh
+        0010159a 84              ??         84h
+        0010159b 00              ??         00h
+        0010159c 00              ??         00h
+        0010159d 00              ??         00h
+        0010159e 00              ??         00h
+        0010159f 00              ??         00h
+                             LAB_001015a0                                    XREF[1]:     001014d2(j)  
+        001015a0 89 c1           MOV        ECX,EAX
+        001015a2 c0 e8 06        SHR        AL,0x6
+        001015a5 48 83 c2 03     ADD        RDX,0x3
+        001015a9 c0 e9 04        SHR        CL,0x4
+        001015ac 83 e0 03        AND        EAX,0x3
+        001015af 83 e1 03        AND        ECX,0x3
+        001015b2 8b 04 84        MOV        EAX,dword ptr [RSP + RAX*0x4]
+        001015b5 31 04 8c        XOR        dword ptr [RSP + RCX*0x4],EAX
+        001015b8 e9 88 fd        JMP        LAB_00101345
+                 ff ff
+        001015bd 0f              ??         0Fh
+        001015be 1f              ??         1Fh
+        001015bf 00              ??         00h
+                             LAB_001015c0                                    XREF[1]:     0010138b(j)  
+        001015c0 89 c2           MOV        EDX,EAX
+        001015c2 c0 e8 06        SHR        AL,0x6
+        001015c5 c0 ea 04        SHR        DL,0x4
+        001015c8 83 e0 03        AND        EAX,0x3
+        001015cb 83 e2 03        AND        EDX,0x3
+        001015ce 8b 04 84        MOV        EAX,dword ptr [RSP + RAX*0x4]
+        001015d1 01 04 94        ADD        dword ptr [RSP + RDX*0x4],EAX
+        001015d4 48 89 ca        MOV        RDX,RCX
+        001015d7 e9 69 fd        JMP        LAB_00101345
+                 ff ff
+        001015dc 0f              ??         0Fh
+        001015dd 1f              ??         1Fh
+        001015de 40              ??         40h    @
+        001015df 00              ??         00h
+                             LAB_001015e0                                    XREF[1]:     001013e0(j)  
+        001015e0 89 c1           MOV        ECX,EAX
+        001015e2 c0 e8 04        SHR        AL,0x4
+        001015e5 48 83 c2 05     ADD        RDX,0x5
+        001015e9 c0 e9 06        SHR        CL,0x6
+        001015ec 83 e0 03        AND        EAX,0x3
+        001015ef 83 e1 03        AND        ECX,0x3
+        001015f2 8b 0c 8c        MOV        ECX,dword ptr [RSP + RCX*0x4]
+        001015f5 89 0c 84        MOV        dword ptr [RSP + RAX*0x4],ECX
+        001015f8 e9 48 fd        JMP        LAB_00101345
+                 ff ff
+        001015fd 0f              ??         0Fh
+        001015fe 1f              ??         1Fh
+        001015ff 00              ??         00h
+                             LAB_00101600                                    XREF[1]:     0010182e(j)  
+        00101600 44 8b 42 02     MOV        R8D,dword ptr [RDX + 0x2]
+        00101604 44 89 c0        MOV        EAX,R8D
+        00101607 f7 d0           NOT        EAX
+        00101609 83 e0 07        AND        EAX,0x7
+        0010160c 48 c1 e0 02     SHL        RAX,0x2
+        00101610 48 8d 34 03     LEA        RSI,[RBX + RAX*0x1]
+        00101614 48 39 de        CMP        RSI,RBX
+        00101617 0f 86 ce        JBE        LAB_001016eb
+                 00 00 00
+        0010161d 48 8d 78 ff     LEA        RDI,[RAX + -0x1]
+        00101621 48 89 f9        MOV        RCX,RDI
+        00101624 48 c1 e9 03     SHR        RCX,0x3
+        00101628 4c 8d 49 01     LEA        R9,[RCX + 0x1]
+        0010162c 48 f7 d9        NEG        RCX
+        0010162f 4e 8d 14        LEA        R10,[R9*0x4]
+                 8d 00 00 
+                 00 00
+        00101637 48 8d 0c 88     LEA        RCX,[RAX + RCX*0x4]
+        0010163b 49 39 ca        CMP        R10,RCX
+        0010163e 0f 8f b8        JG         LAB_001021fc
+                 0b 00 00
+        00101644 48 83 ff 17     CMP        RDI,0x17
+        00101648 0f 86 ae        JBE        LAB_001021fc
+                 0b 00 00
+        0010164e 4c 89 cf        MOV        RDI,R9
+        00101651 48 8d 44        LEA        RAX,[RBX + RAX*0x1 + -0xc]
+                 03 f4
+        00101656 48 89 d9        MOV        RCX,RBX
+        00101659 48 c1 ef 02     SHR        RDI,0x2
+        0010165d 49 89 c3        MOV        R11,RAX
+        00101660 48 c1 e7 04     SHL        RDI,0x4
+        00101664 49 29 fb        SUB        R11,RDI
+        00101667 4c 89 df        MOV        RDI,R11
+        0010166a 66 0f 1f        NOP        word ptr [RAX + RAX*0x1]
+                 44 00 00
+                             LAB_00101670                                    XREF[1]:     00101695(j)  
+        00101670 66 0f 6f 01     MOVDQA     XMM0,xmmword ptr [RCX]=>local_3b78
+        00101674 f3 0f 6f 28     MOVDQU     XMM5,xmmword ptr [RAX]
+        00101678 48 83 e8 10     SUB        RAX,0x10
+        0010167c 48 83 c1 10     ADD        RCX,0x10
+        00101680 66 0f 70        PSHUFD     XMM1,XMM5,0x1b
+                 cd 1b
+        00101685 66 0f 70        PSHUFD     XMM0,XMM0,0x1b
+                 c0 1b
+        0010168a 0f 29 49 f0     MOVAPS     xmmword ptr [RCX + local_3b78[0]],XMM1
+        0010168e 0f 11 40 10     MOVUPS     xmmword ptr [RAX + 0x10],XMM0
+        00101692 48 39 c7        CMP        RDI,RAX
+        00101695 75 d9           JNZ        LAB_00101670
+        00101697 4c 89 cf        MOV        RDI,R9
+        0010169a 48 83 e7 fc     AND        RDI,-0x4
+        0010169e 48 89 f8        MOV        RAX,RDI
+        001016a1 48 8d 0c bb     LEA        RCX,[RBX + RDI*0x4]
+        001016a5 48 f7 d8        NEG        RAX
+        001016a8 48 8d 04 86     LEA        RAX,[RSI + RAX*0x4]
+        001016ac 49 39 f9        CMP        R9,RDI
+        001016af 74 3a           JZ         LAB_001016eb
+        001016b1 8b 31           MOV        ESI,dword ptr [RCX]
+        001016b3 8b 38           MOV        EDI,dword ptr [RAX]
+        001016b5 89 39           MOV        dword ptr [RCX],EDI
+        001016b7 48 8d 79 04     LEA        RDI,[RCX + 0x4]
+        001016bb 89 30           MOV        dword ptr [RAX],ESI
+        001016bd 48 8d 70 fc     LEA        RSI,[RAX + -0x4]
+        001016c1 48 39 f7        CMP        RDI,RSI
+        001016c4 73 25           JNC        LAB_001016eb
+        001016c6 8b 71 04        MOV        ESI,dword ptr [RCX + 0x4]
+        001016c9 8b 78 fc        MOV        EDI,dword ptr [RAX + -0x4]
+        001016cc 89 79 04        MOV        dword ptr [RCX + 0x4],EDI
+        001016cf 48 8d 78 f8     LEA        RDI,[RAX + -0x8]
+        001016d3 89 70 fc        MOV        dword ptr [RAX + -0x4],ESI
+        001016d6 48 8d 71 08     LEA        RSI,[RCX + 0x8]
+        001016da 48 39 f7        CMP        RDI,RSI
+        001016dd 76 0c           JBE        LAB_001016eb
+        001016df 8b 71 08        MOV        ESI,dword ptr [RCX + 0x8]
+        001016e2 8b 78 f8        MOV        EDI,dword ptr [RAX + -0x8]
+        001016e5 89 79 08        MOV        dword ptr [RCX + 0x8],EDI
+        001016e8 89 70 f8        MOV        dword ptr [RAX + -0x8],ESI
+                             LAB_001016eb                                    XREF[5]:     00101617(j), 001016af(j), 
+                                                                                          001016c4(j), 001016dd(j), 
+                                                                                          00102217(j)  
+        001016eb 41 83 e0 07     AND        R8D,0x7
+        001016ef be 08 00        MOV        ESI,0x8
+                 00 00
+        001016f4 48 8d 44        LEA        RAX=>local_3b68[12],[RSP + 0x1c]
+                 24 1c
+        001016f9 44 29 c6        SUB        ESI,R8D
+        001016fc 48 8d 3c b3     LEA        RDI,[RBX + RSI*0x4]
+        00101700 48 39 c7        CMP        RDI,RAX
+        00101703 0f 83 de        JNC        LAB_001017e7
+                 00 00 00
+        00101709 4c 8d 44        LEA        R8=>local_3b68[11],[RSP + 0x1b]
+                 24 1b
+        0010170e 49 29 f8        SUB        R8,RDI
+        00101711 4c 89 c1        MOV        RCX,R8
+        00101714 48 c1 e9 03     SHR        RCX,0x3
+        00101718 49 89 c9        MOV        R9,RCX
+        0010171b 48 8d 74        LEA        RSI,[RSI + RCX*0x1 + 0x1]
+                 0e 01
+        00101720 49 f7 d9        NEG        R9
+        00101723 48 c1 e6 02     SHL        RSI,0x2
+        00101727 4e 8d 0c        LEA        R9,[0x1c + R9*0x4]
+                 8d 1c 00 
+                 00 00
+        0010172f 49 39 f1        CMP        R9,RSI
+        00101732 48 8d 74        LEA        RSI=>ByteRIP,[RSP + 0x20]
+                 24 20
+        00101737 41 0f 9d c1     SETGE      R9B
+        0010173b 48 39 f7        CMP        RDI,RSI
+        0010173e 40 0f 93 c6     SETNC      SIL
+        00101742 41 08 f1        OR         R9B,SIL
+        00101745 0f 84 ed        JZ         LAB_00101f38
+                 07 00 00
+        0010174b 49 83 f8 17     CMP        R8,0x17
+        0010174f 0f 86 e3        JBE        LAB_00101f38
+                 07 00 00
+        00101755 4c 8d 49 01     LEA        R9,[RCX + 0x1]
+        00101759 48 8d 74        LEA        RSI=>local_3b68,[RSP + 0x10]
+                 24 10
+        0010175e 48 89 f9        MOV        RCX,RDI
+        00101761 4d 89 c8        MOV        R8,R9
+        00101764 49 c1 e8 02     SHR        R8,0x2
+        00101768 49 c1 e0 04     SHL        R8,0x4
+        0010176c 49 01 f8        ADD        R8,RDI
+        0010176f 90              NOP
+                             LAB_00101770                                    XREF[1]:     00101791(j)  
+        00101770 f3 0f 6f 01     MOVDQU     XMM0,xmmword ptr [RCX]
+        00101774 66 0f 70        PSHUFD     XMM1,xmmword ptr [RSI]=>local_3b68,0x1b
+                 0e 1b
+        00101779 48 83 c1 10     ADD        RCX,0x10
+        0010177d 0f 11 49 f0     MOVUPS     xmmword ptr [RCX + -0x10],XMM1
+        00101781 48 83 ee 10     SUB        RSI,0x10
+        00101785 66 0f 70        PSHUFD     XMM0,XMM0,0x1b
+                 c0 1b
+        0010178a 0f 29 46 10     MOVAPS     xmmword ptr [RSI + local_3b68[0]],XMM0
+        0010178e 4c 39 c1        CMP        RCX,R8
+        00101791 75 dd           JNZ        LAB_00101770
+        00101793 4c 89 ce        MOV        RSI,R9
+        00101796 48 83 e6 fc     AND        RSI,-0x4
+        0010179a 48 8d 0c b7     LEA        RCX,[RDI + RSI*0x4]
+        0010179e 48 89 f7        MOV        RDI,RSI
+        001017a1 48 f7 df        NEG        RDI
+        001017a4 48 8d 04 b8     LEA        RAX,[RAX + RDI*0x4]
+        001017a8 49 39 f1        CMP        R9,RSI
+        001017ab 74 3a           JZ         LAB_001017e7
+        001017ad 8b 31           MOV        ESI,dword ptr [RCX]
+        001017af 8b 38           MOV        EDI,dword ptr [RAX]
+        001017b1 89 39           MOV        dword ptr [RCX],EDI
+        001017b3 48 8d 78 fc     LEA        RDI,[RAX + -0x4]
+        001017b7 89 30           MOV        dword ptr [RAX],ESI
+        001017b9 48 8d 71 04     LEA        RSI,[RCX + 0x4]
+        001017bd 48 39 f7        CMP        RDI,RSI
+        001017c0 76 25           JBE        LAB_001017e7
+        001017c2 8b 71 04        MOV        ESI,dword ptr [RCX + 0x4]
+        001017c5 8b 78 fc        MOV        EDI,dword ptr [RAX + -0x4]
+        001017c8 89 79 04        MOV        dword ptr [RCX + 0x4],EDI
+        001017cb 48 8d 79 08     LEA        RDI,[RCX + 0x8]
+        001017cf 89 70 fc        MOV        dword ptr [RAX + -0x4],ESI
+        001017d2 48 8d 70 f8     LEA        RSI,[RAX + -0x8]
+        001017d6 48 39 f7        CMP        RDI,RSI
+        001017d9 73 0c           JNC        LAB_001017e7
+        001017db 8b 71 08        MOV        ESI,dword ptr [RCX + 0x8]
+        001017de 8b 78 f8        MOV        EDI,dword ptr [RAX + -0x8]
+        001017e1 89 79 08        MOV        dword ptr [RCX + 0x8],EDI
+        001017e4 89 70 f8        MOV        dword ptr [RAX + -0x8],ESI
+                             LAB_001017e7                                    XREF[5]:     00101703(j), 001017ab(j), 
+                                                                                          001017c0(j), 001017d9(j), 
+                                                                                          00101f4f(j)  
+        001017e7 66 0f 6f        MOVDQA     XMM0,xmmword ptr [RSP]=>local_3b78
+                 04 24
+        001017ec 66 0f 70        PSHUFD     XMM1,xmmword ptr [RSP + local_3b68[0]],0x1b
+                 4c 24 10 1b
+        001017f3 0f 29 0c 24     MOVAPS     xmmword ptr [RSP]=>local_3b78,XMM1
+        001017f7 66 0f 70        PSHUFD     XMM0,XMM0,0x1b
+                 c0 1b
+        001017fc 0f 29 44        MOVAPS     xmmword ptr [RSP + local_3b68[0]],XMM0
+                 24 10
+                             LAB_00101801                                    XREF[1]:     00101436(j)  
+        00101801 48 83 c2 09     ADD        RDX,0x9
+        00101805 e9 3b fb        JMP        LAB_00101345
+                 ff ff
+        0010180a 66              ??         66h    f
+        0010180b 0f              ??         0Fh
+        0010180c 1f              ??         1Fh
+        0010180d 44              ??         44h    D
+        0010180e 00              ??         00h
+        0010180f 00              ??         00h
+                             LAB_00101810                                    XREF[1]:     001013b2(j)  
+        00101810 48 8d 42 02     LEA        RAX,[RDX + 0x2]
+        00101814 48 89 44        MOV        qword ptr [RSP + ByteRIP],RAX
+                 24 20
+        00101819 0f b6 42 01     MOVZX      EAX,byte ptr [RDX + 0x1]
+        0010181d 89 c1           MOV        ECX,EAX
+        0010181f 83 e1 03        AND        ECX,0x3
+        00101822 80 f9 02        CMP        CL,0x2
+        00101825 0f 84 a5        JZ         LAB_00101cd0
+                 04 00 00
+        0010182b 80 f9 03        CMP        CL,0x3
+        0010182e 0f 84 cc        JZ         LAB_00101600
+                 fd ff ff
+        00101834 c0 e8 06        SHR        AL,0x6
+        00101837 83 e0 03        AND        EAX,0x3
+        0010183a 44 8b 04 84     MOV        R8D,dword ptr [RSP + RAX*0x4]
+        0010183e b8 07 00        MOV        EAX,0x7
+                 00 00
+        00101843 44 29 c0        SUB        EAX,R8D
+        00101846 48 c1 e0 02     SHL        RAX,0x2
+        0010184a 48 8d 34 03     LEA        RSI,[RBX + RAX*0x1]
+        0010184e 80 f9 01        CMP        CL,0x1
+        00101851 0f 84 01        JZ         LAB_00101f58
+                 07 00 00
+        00101857 48 39 de        CMP        RSI,RBX
+        0010185a 0f 86 cb        JBE        LAB_0010192b
+                 00 00 00
+        00101860 48 8d 78 ff     LEA        RDI,[RAX + -0x1]
+        00101864 48 89 f9        MOV        RCX,RDI
+        00101867 48 c1 e9 03     SHR        RCX,0x3
+        0010186b 4c 8d 49 01     LEA        R9,[RCX + 0x1]
+        0010186f 48 f7 d9        NEG        RCX
+        00101872 4e 8d 14        LEA        R10,[R9*0x4]
+                 8d 00 00 
+                 00 00
+        0010187a 48 8d 0c 88     LEA        RCX,[RAX + RCX*0x4]
+        0010187e 49 39 ca        CMP        R10,RCX
+        00101881 0f 8f 95        JG         LAB_0010221c
+                 09 00 00
+        00101887 48 83 ff 17     CMP        RDI,0x17
+        0010188b 0f 86 8b        JBE        LAB_0010221c
+                 09 00 00
+        00101891 4c 89 cf        MOV        RDI,R9
+        00101894 48 8d 44        LEA        RAX,[RBX + RAX*0x1 + -0xc]
+                 03 f4
+        00101899 48 89 d9        MOV        RCX,RBX
+        0010189c 48 c1 ef 02     SHR        RDI,0x2
+        001018a0 49 89 c3        MOV        R11,RAX
+        001018a3 48 c1 e7 04     SHL        RDI,0x4
+        001018a7 49 29 fb        SUB        R11,RDI
+        001018aa 4c 89 df        MOV        RDI,R11
+        001018ad 0f 1f 00        NOP        dword ptr [RAX]
+                             LAB_001018b0                                    XREF[1]:     001018d5(j)  
+        001018b0 66 0f 6f 01     MOVDQA     XMM0,xmmword ptr [RCX]=>local_3b78
+        001018b4 f3 0f 6f 10     MOVDQU     XMM2,xmmword ptr [RAX]
+        001018b8 48 83 e8 10     SUB        RAX,0x10
+        001018bc 48 83 c1 10     ADD        RCX,0x10
+        001018c0 66 0f 70        PSHUFD     XMM1,XMM2,0x1b
+                 ca 1b
+        001018c5 66 0f 70        PSHUFD     XMM0,XMM0,0x1b
+                 c0 1b
+        001018ca 0f 29 49 f0     MOVAPS     xmmword ptr [RCX + local_3b78[0]],XMM1
+        001018ce 0f 11 40 10     MOVUPS     xmmword ptr [RAX + 0x10],XMM0
+        001018d2 48 39 f8        CMP        RAX,RDI
+        001018d5 75 d9           JNZ        LAB_001018b0
+        001018d7 4c 89 cf        MOV        RDI,R9
+        001018da 48 83 e7 fc     AND        RDI,-0x4
+        001018de 48 89 f8        MOV        RAX,RDI
+        001018e1 48 8d 0c bb     LEA        RCX,[RBX + RDI*0x4]
+        001018e5 48 f7 d8        NEG        RAX
+        001018e8 48 8d 04 86     LEA        RAX,[RSI + RAX*0x4]
+        001018ec 49 39 f9        CMP        R9,RDI
+        001018ef 74 3a           JZ         LAB_0010192b
+        001018f1 8b 31           MOV        ESI,dword ptr [RCX]
+        001018f3 8b 38           MOV        EDI,dword ptr [RAX]
+        001018f5 89 39           MOV        dword ptr [RCX],EDI
+        001018f7 48 8d 78 fc     LEA        RDI,[RAX + -0x4]
+        001018fb 89 30           MOV        dword ptr [RAX],ESI
+        001018fd 48 8d 71 04     LEA        RSI,[RCX + 0x4]
+        00101901 48 39 f7        CMP        RDI,RSI
+        00101904 76 25           JBE        LAB_0010192b
+        00101906 8b 71 04        MOV        ESI,dword ptr [RCX + 0x4]
+        00101909 8b 78 fc        MOV        EDI,dword ptr [RAX + -0x4]
+        0010190c 89 79 04        MOV        dword ptr [RCX + 0x4],EDI
+        0010190f 48 8d 79 08     LEA        RDI,[RCX + 0x8]
+        00101913 89 70 fc        MOV        dword ptr [RAX + -0x4],ESI
+        00101916 48 8d 70 f8     LEA        RSI,[RAX + -0x8]
+        0010191a 48 39 f7        CMP        RDI,RSI
+        0010191d 73 0c           JNC        LAB_0010192b
+        0010191f 8b 71 08        MOV        ESI,dword ptr [RCX + 0x8]
+        00101922 8b 78 f8        MOV        EDI,dword ptr [RAX + -0x8]
+        00101925 89 79 08        MOV        dword ptr [RCX + 0x8],EDI
+        00101928 89 70 f8        MOV        dword ptr [RAX + -0x8],ESI
+                             LAB_0010192b                                    XREF[5]:     0010185a(j), 001018ef(j), 
+                                                                                          00101904(j), 0010191d(j), 
+                                                                                          00102237(j)  
+        0010192b be 08 00        MOV        ESI,0x8
+                 00 00
+        00101930 48 8d 44        LEA        RAX=>local_3b68[12],[RSP + 0x1c]
+                 24 1c
+        00101935 44 29 c6        SUB        ESI,R8D
+        00101938 48 8d 3c b3     LEA        RDI,[RBX + RSI*0x4]
+        0010193c 48 39 c7        CMP        RDI,RAX
+        0010193f 0f 83 e2        JNC        LAB_00101a27
+                 00 00 00
+        00101945 4c 8d 44        LEA        R8=>local_3b68[11],[RSP + 0x1b]
+                 24 1b
+        0010194a 49 29 f8        SUB        R8,RDI
+        0010194d 4c 89 c1        MOV        RCX,R8
+        00101950 48 c1 e9 03     SHR        RCX,0x3
+        00101954 49 89 c9        MOV        R9,RCX
+        00101957 48 8d 74        LEA        RSI,[RSI + RCX*0x1 + 0x1]
+                 0e 01
+        0010195c 49 f7 d9        NEG        R9
+        0010195f 48 c1 e6 02     SHL        RSI,0x2
+        00101963 4e 8d 0c        LEA        R9,[0x1c + R9*0x4]
+                 8d 1c 00 
+                 00 00
+        0010196b 4c 39 ce        CMP        RSI,R9
+        0010196e 48 8d 74        LEA        RSI=>ByteRIP,[RSP + 0x20]
+                 24 20
+        00101973 41 0f 9e c1     SETLE      R9B
+        00101977 48 39 f7        CMP        RDI,RSI
+        0010197a 40 0f 93 c6     SETNC      SIL
+        0010197e 41 08 f1        OR         R9B,SIL
+        00101981 0f 84 f9        JZ         LAB_00101c80
+                 02 00 00
+        00101987 49 83 f8 17     CMP        R8,0x17
+        0010198b 0f 86 ef        JBE        LAB_00101c80
+                 02 00 00
+        00101991 4c 8d 49 01     LEA        R9,[RCX + 0x1]
+        00101995 48 8d 74        LEA        RSI=>local_3b68,[RSP + 0x10]
+                 24 10
+        0010199a 48 89 f9        MOV        RCX,RDI
+        0010199d 4d 89 c8        MOV        R8,R9
+        001019a0 49 c1 e8 02     SHR        R8,0x2
+        001019a4 49 c1 e0 04     SHL        R8,0x4
+        001019a8 49 01 f8        ADD        R8,RDI
+        001019ab 0f 1f 44        NOP        dword ptr [RAX + RAX*0x1]
+                 00 00
+                             LAB_001019b0                                    XREF[1]:     001019d1(j)  
+        001019b0 f3 0f 6f 01     MOVDQU     XMM0,xmmword ptr [RCX]
+        001019b4 66 0f 70        PSHUFD     XMM1,xmmword ptr [RSI]=>local_3b68,0x1b
+                 0e 1b
+        001019b9 48 83 c1 10     ADD        RCX,0x10
+        001019bd 0f 11 49 f0     MOVUPS     xmmword ptr [RCX + -0x10],XMM1
+        001019c1 48 83 ee 10     SUB        RSI,0x10
+        001019c5 66 0f 70        PSHUFD     XMM0,XMM0,0x1b
+                 c0 1b
+        001019ca 0f 29 46 10     MOVAPS     xmmword ptr [RSI + local_3b68[0]],XMM0
+        001019ce 4c 39 c1        CMP        RCX,R8
+        001019d1 75 dd           JNZ        LAB_001019b0
+        001019d3 4c 89 ce        MOV        RSI,R9
+        001019d6 48 83 e6 fc     AND        RSI,-0x4
+        001019da 48 8d 0c b7     LEA        RCX,[RDI + RSI*0x4]
+        001019de 48 89 f7        MOV        RDI,RSI
+        001019e1 48 f7 df        NEG        RDI
+        001019e4 48 8d 04 b8     LEA        RAX,[RAX + RDI*0x4]
+        001019e8 49 39 f1        CMP        R9,RSI
+        001019eb 74 3a           JZ         LAB_00101a27
+        001019ed 8b 31           MOV        ESI,dword ptr [RCX]
+        001019ef 8b 38           MOV        EDI,dword ptr [RAX]
+        001019f1 89 39           MOV        dword ptr [RCX],EDI
+        001019f3 48 8d 79 04     LEA        RDI,[RCX + 0x4]
+        001019f7 89 30           MOV        dword ptr [RAX],ESI
+        001019f9 48 8d 70 fc     LEA        RSI,[RAX + -0x4]
+        001019fd 48 39 f7        CMP        RDI,RSI
+        00101a00 73 25           JNC        LAB_00101a27
+        00101a02 8b 71 04        MOV        ESI,dword ptr [RCX + 0x4]
+        00101a05 8b 78 fc        MOV        EDI,dword ptr [RAX + -0x4]
+        00101a08 89 79 04        MOV        dword ptr [RCX + 0x4],EDI
+        00101a0b 48 8d 79 08     LEA        RDI,[RCX + 0x8]
+        00101a0f 89 70 fc        MOV        dword ptr [RAX + -0x4],ESI
+        00101a12 48 8d 70 f8     LEA        RSI,[RAX + -0x8]
+        00101a16 48 39 f7        CMP        RDI,RSI
+        00101a19 73 0c           JNC        LAB_00101a27
+        00101a1b 8b 71 08        MOV        ESI,dword ptr [RCX + 0x8]
+        00101a1e 8b 78 f8        MOV        EDI,dword ptr [RAX + -0x8]
+        00101a21 89 79 08        MOV        dword ptr [RCX + 0x8],EDI
+        00101a24 89 70 f8        MOV        dword ptr [RAX + -0x8],ESI
+                             LAB_00101a27                                    XREF[5]:     0010193f(j), 001019eb(j), 
+                                                                                          00101a00(j), 00101a19(j), 
+                                                                                          00101c97(j)  
+        00101a27 66 0f 6f        MOVDQA     XMM0,xmmword ptr [RSP]=>local_3b78
+                 04 24
+        00101a2c 66 0f 70        PSHUFD     XMM1,xmmword ptr [RSP + local_3b68[0]],0x1b
+                 4c 24 10 1b
+        00101a33 48 83 c2 04     ADD        RDX,0x4
+        00101a37 0f 29 0c 24     MOVAPS     xmmword ptr [RSP]=>local_3b78,XMM1
+        00101a3b 66 0f 70        PSHUFD     XMM0,XMM0,0x1b
+                 c0 1b
+        00101a40 0f 29 44        MOVAPS     xmmword ptr [RSP + local_3b68[0]],XMM0
+                 24 10
+        00101a45 e9 fb f8        JMP        LAB_00101345
+                 ff ff
+        00101a4a 66              ??         66h    f
+        00101a4b 0f              ??         0Fh
+        00101a4c 1f              ??         1Fh
+        00101a4d 44              ??         44h    D
+        00101a4e 00              ??         00h
+        00101a4f 00              ??         00h
+                             LAB_00101a50                                    XREF[1]:     001014fa(j)  
+        00101a50 48 8d 72 02     LEA        RSI,[RDX + 0x2]
+        00101a54 48 89 74        MOV        qword ptr [RSP + ByteRIP],RSI
+                 24 20
+        00101a59 0f b6 42 01     MOVZX      EAX,byte ptr [RDX + 0x1]
+        00101a5d 89 c1           MOV        ECX,EAX
+        00101a5f 83 e1 03        AND        ECX,0x3
+        00101a62 0f 84 78        JZ         LAB_00101be0
+                 01 00 00
+        00101a68 80 f9 02        CMP        CL,0x2
+        00101a6b 0f 85 cf        JNZ        LAB_00101540
+                 fa ff ff
+        00101a71 c0 e8 04        SHR        AL,0x4
+        00101a74 0f b6 4a 02     MOVZX      ECX,byte ptr [RDX + 0x2]
+        00101a78 48 83 c2 06     ADD        RDX,0x6
+        00101a7c 83 e0 03        AND        EAX,0x3
+        00101a7f d3 2c 84        SHR        dword ptr [RSP + RAX*0x4],CL
+        00101a82 e9 be f8        JMP        LAB_00101345
+                 ff ff
+        00101a87 66              ??         66h    f
+        00101a88 0f              ??         0Fh
+        00101a89 1f              ??         1Fh
+        00101a8a 84              ??         84h
+        00101a8b 00              ??         00h
+        00101a8c 00              ??         00h
+        00101a8d 00              ??         00h
+        00101a8e 00              ??         00h
+        00101a8f 00              ??         00h
+                             LAB_00101a90                                    XREF[1]:     001013c0(j)  
+        00101a90 48 8d 72 02     LEA        RSI,[RDX + 0x2]
+        00101a94 48 89 74        MOV        qword ptr [RSP + ByteRIP],RSI
+                 24 20
+        00101a99 0f b6 42 01     MOVZX      EAX,byte ptr [RDX + 0x1]
+        00101a9d 89 c1           MOV        ECX,EAX
+        00101a9f 83 e1 03        AND        ECX,0x3
+        00101aa2 80 f9 02        CMP        CL,0x2
+        00101aa5 0f 84 55        JZ         LAB_00101f00
+                 04 00 00
+        00101aab 80 f9 03        CMP        CL,0x3
+        00101aae 0f 84 ec        JZ         LAB_00101ca0
+                 01 00 00
+        00101ab4 80 f9 01        CMP        CL,0x1
+        00101ab7 0f 84 c3        JZ         LAB_00102180
+                 06 00 00
+        00101abd 89 c2           MOV        EDX,EAX
+        00101abf c0 e8 04        SHR        AL,0x4
+        00101ac2 c0 ea 06        SHR        DL,0x6
+        00101ac5 83 e0 03        AND        EAX,0x3
+        00101ac8 0f b6 d2        MOVZX      EDX,DL
+        00101acb 0f b6 3c 84     MOVZX      EDI,byte ptr [RSP + RAX*0x4]
+        00101acf 48 8d 34 93     LEA        RSI,[RBX + RDX*0x4]
+        00101ad3 ba 01 00        MOV        EDX,0x1
+                 00 00
+        00101ad8 e8 f3 f5        CALL       <EXTERNAL>::write                                ssize_t write(int __fd, void * _
+                 ff ff
+        00101add 48 83 f8 01     CMP        RAX,0x1
+        00101ae1 74 15           JZ         LAB_00101af8
+        00101ae3 48 8b 44        MOV        RAX,qword ptr [RSP + ByteRIP]
+                 24 20
+        00101ae8 c6 00 00        MOV        byte ptr [RAX],0x0
+        00101aeb 48 8b 54        MOV        RDX,qword ptr [RSP + ByteRIP]
+                 24 20
+        00101af0 e9 50 f8        JMP        LAB_00101345
+                 ff ff
+        00101af5 0f              ??         0Fh
+        00101af6 1f              ??         1Fh
+        00101af7 00              ??         00h
+                             LAB_00101af8                                    XREF[2]:     00101ae1(j), 00101b84(j)  
+        00101af8 48 8b 54        MOV        RDX,qword ptr [RSP + ByteRIP]
+                 24 20
+        00101afd e9 43 f8        JMP        LAB_00101345
+                 ff ff
+        00101b02 66              ??         66h    f
+        00101b03 0f              ??         0Fh
+        00101b04 1f              ??         1Fh
+        00101b05 44              ??         44h    D
+        00101b06 00              ??         00h
+        00101b07 00              ??         00h
+                             LAB_00101b08                                    XREF[1]:     001014b2(j)  
+        00101b08 48 8d 42 02     LEA        RAX,[RDX + 0x2]
+        00101b0c 48 89 44        MOV        qword ptr [RSP + ByteRIP],RAX
+                 24 20
+        00101b11 0f b6 42 01     MOVZX      EAX,byte ptr [RDX + 0x1]
+        00101b15 89 c1           MOV        ECX,EAX
+        00101b17 83 e1 03        AND        ECX,0x3
+        00101b1a 0f 84 00        JZ         LAB_00101c20
+                 01 00 00
+        00101b20 80 f9 02        CMP        CL,0x2
+        00101b23 0f 85 17        JNZ        LAB_00101540
+                 fa ff ff
+        00101b29 c0 e8 04        SHR        AL,0x4
+        00101b2c 0f b6 4a 02     MOVZX      ECX,byte ptr [RDX + 0x2]
+        00101b30 48 83 c2 07     ADD        RDX,0x7
+        00101b34 83 e0 03        AND        EAX,0x3
+        00101b37 d3 24 84        SHL        dword ptr [RSP + RAX*0x4],CL
+        00101b3a e9 06 f8        JMP        LAB_00101345
+                 ff ff
+        00101b3f 90              ??         90h
+                             LAB_00101b40                                    XREF[1]:     0010135d(j)  
+        00101b40 48 8d 42 02     LEA        RAX,[RDX + 0x2]
+        00101b44 48 89 44        MOV        qword ptr [RSP + ByteRIP],RAX
+                 24 20
+        00101b49 0f b6 42 01     MOVZX      EAX,byte ptr [RDX + 0x1]
+        00101b4d 89 c1           MOV        ECX,EAX
+        00101b4f 83 e1 03        AND        ECX,0x3
+        00101b52 0f 84 08        JZ         LAB_00101c60
+                 01 00 00
+        00101b58 80 f9 02        CMP        CL,0x2
+        00101b5b 0f 85 df        JNZ        LAB_00101540
+                 f9 ff ff
+        00101b61 8b 6a 02        MOV        EBP,dword ptr [RDX + 0x2]
+        00101b64 48 83 c2 08     ADD        RDX,0x8
+        00101b68 48 89 54        MOV        qword ptr [RSP + ByteRIP],RDX
+                 24 20
+                             LAB_00101b6d                                    XREF[1]:     00101c74(j)  
+        00101b6d c0 e8 04        SHR        AL,0x4
+        00101b70 31 ff           XOR        EDI,EDI
+        00101b72 48 89 ea        MOV        RDX,RBP
+        00101b75 83 e0 03        AND        EAX,0x3
+        00101b78 48 8d 34 83     LEA        RSI,[RBX + RAX*0x4]
+        00101b7c e8 7f f5        CALL       <EXTERNAL>::read                                 ssize_t read(int __fd, void * __
+                 ff ff
+        00101b81 48 39 c5        CMP        RBP,RAX
+        00101b84 0f 84 6e        JZ         LAB_00101af8
+                 ff ff ff
+        00101b8a 48 8b 44        MOV        RAX,qword ptr [RSP + ByteRIP]
+                 24 20
+        00101b8f 41 bc 01        MOV        R12D,0x1
+                 00 00 00
+        00101b95 c6 00 00        MOV        byte ptr [RAX],0x0
+        00101b98 48 8b 54        MOV        RDX,qword ptr [RSP + ByteRIP]
+                 24 20
+        00101b9d e9 a3 f7        JMP        LAB_00101345
+                 ff ff
+        00101ba2 66              ??         66h    f
+        00101ba3 0f              ??         0Fh
+        00101ba4 1f              ??         1Fh
+        00101ba5 44              ??         44h    D
+        00101ba6 00              ??         00h
+        00101ba7 00              ??         00h
+                             LAB_00101ba8                                    XREF[1]:     0010136b(j)  
+        00101ba8 48 8d 42 02     LEA        RAX,[RDX + 0x2]
+        00101bac 48 89 44        MOV        qword ptr [RSP + ByteRIP],RAX
+                 24 20
+        00101bb1 0f b6 42 01     MOVZX      EAX,byte ptr [RDX + 0x1]
+        00101bb5 89 c1           MOV        ECX,EAX
+        00101bb7 83 e1 03        AND        ECX,0x3
+        00101bba 74 44           JZ         LAB_00101c00
+        00101bbc 80 f9 02        CMP        CL,0x2
+        00101bbf 0f 85 7b        JNZ        LAB_00101540
+                 f9 ff ff
+        00101bc5 c0 e8 04        SHR        AL,0x4
+        00101bc8 48 83 c2 07     ADD        RDX,0x7
+        00101bcc 83 e0 03        AND        EAX,0x3
+        00101bcf 8b 0c 84        MOV        ECX,dword ptr [RSP + RAX*0x4]
+        00101bd2 0b 4a fb        OR         ECX,dword ptr [RDX + -0x5]
+        00101bd5 89 0c 84        MOV        dword ptr [RSP + RAX*0x4],ECX
+        00101bd8 e9 68 f7        JMP        LAB_00101345
+                 ff ff
+        00101bdd 0f              ??         0Fh
+        00101bde 1f              ??         1Fh
+        00101bdf 00              ??         00h
+                             LAB_00101be0                                    XREF[1]:     00101a62(j)  
+        00101be0 89 c2           MOV        EDX,EAX
+        00101be2 c0 e8 06        SHR        AL,0x6
+        00101be5 c0 ea 04        SHR        DL,0x4
+        00101be8 83 e0 03        AND        EAX,0x3
+        00101beb 83 e2 03        AND        EDX,0x3
+        00101bee 0f b6 0c 84     MOVZX      ECX,byte ptr [RSP + RAX*0x4]
+        00101bf2 d3 2c 94        SHR        dword ptr [RSP + RDX*0x4],CL
+        00101bf5 48 89 f2        MOV        RDX,RSI
+        00101bf8 e9 48 f7        JMP        LAB_00101345
+                 ff ff
+        00101bfd 0f              ??         0Fh
+        00101bfe 1f              ??         1Fh
+        00101bff 00              ??         00h
+                             LAB_00101c00                                    XREF[1]:     00101bba(j)  
+        00101c00 89 c1           MOV        ECX,EAX
+        00101c02 c0 e8 06        SHR        AL,0x6
+        00101c05 48 83 c2 04     ADD        RDX,0x4
+        00101c09 c0 e9 04        SHR        CL,0x4
+        00101c0c 83 e0 03        AND        EAX,0x3
+        00101c0f 83 e1 03        AND        ECX,0x3
+        00101c12 8b 04 84        MOV        EAX,dword ptr [RSP + RAX*0x4]
+        00101c15 09 04 8c        OR         dword ptr [RSP + RCX*0x4],EAX
+        00101c18 e9 28 f7        JMP        LAB_00101345
+                 ff ff
+        00101c1d 0f              ??         0Fh
+        00101c1e 1f              ??         1Fh
+        00101c1f 00              ??         00h
+                             LAB_00101c20                                    XREF[1]:     00101b1a(j)  
+        00101c20 89 c6           MOV        ESI,EAX
+        00101c22 c0 e8 06        SHR        AL,0x6
+        00101c25 48 83 c2 04     ADD        RDX,0x4
+        00101c29 40 c0 ee 04     SHR        SIL,0x4
+        00101c2d 83 e0 03        AND        EAX,0x3
+        00101c30 83 e6 03        AND        ESI,0x3
+        00101c33 0f b6 0c 84     MOVZX      ECX,byte ptr [RSP + RAX*0x4]
+        00101c37 d3 24 b4        SHL        dword ptr [RSP + RSI*0x4],CL
+        00101c3a e9 06 f7        JMP        LAB_00101345
+                 ff ff
+        00101c3f 90              ??         90h
+                             LAB_00101c40                                    XREF[1]:     00101482(j)  
+        00101c40 89 c1           MOV        ECX,EAX
+        00101c42 c0 e8 06        SHR        AL,0x6
+        00101c45 48 83 c2 03     ADD        RDX,0x3
+        00101c49 c0 e9 04        SHR        CL,0x4
+        00101c4c 83 e0 03        AND        EAX,0x3
+        00101c4f 83 e1 03        AND        ECX,0x3
+        00101c52 8b 34 8c        MOV        ESI,dword ptr [RSP + RCX*0x4]
+        00101c55 2b 34 84        SUB        ESI,dword ptr [RSP + RAX*0x4]
+        00101c58 89 34 8c        MOV        dword ptr [RSP + RCX*0x4],ESI
+        00101c5b e9 e5 f6        JMP        LAB_00101345
+                 ff ff
+                             LAB_00101c60                                    XREF[1]:     00101b52(j)  
+        00101c60 89 c1           MOV        ECX,EAX
+        00101c62 48 83 c2 03     ADD        RDX,0x3
+        00101c66 c0 e9 06        SHR        CL,0x6
+        00101c69 48 89 54        MOV        qword ptr [RSP + ByteRIP],RDX
+                 24 20
+        00101c6e 83 e1 03        AND        ECX,0x3
+        00101c71 8b 2c 8c        MOV        EBP,dword ptr [RSP + RCX*0x4]
+        00101c74 e9 f4 fe        JMP        LAB_00101b6d
+                 ff ff
+        00101c79 0f              ??         0Fh
+        00101c7a 1f              ??         1Fh
+        00101c7b 80              ??         80h
+        00101c7c 00              ??         00h
+        00101c7d 00              ??         00h
+        00101c7e 00              ??         00h
+        00101c7f 00              ??         00h
+                             LAB_00101c80                                    XREF[3]:     00101981(j), 0010198b(j), 
+                                                                                          00101c95(j)  
+        00101c80 8b 0f           MOV        ECX,dword ptr [RDI]
+        00101c82 8b 30           MOV        ESI,dword ptr [RAX]=>local_3b68[12]
+        00101c84 48 83 c7 04     ADD        RDI,0x4
+        00101c88 48 83 e8 04     SUB        RAX,0x4
+        00101c8c 89 77 fc        MOV        dword ptr [RDI + -0x4],ESI
+        00101c8f 89 48 04        MOV        dword ptr [RAX + local_3b68[12]],ECX
+        00101c92 48 39 c7        CMP        RDI,RAX
+        00101c95 72 e9           JC         LAB_00101c80
+        00101c97 e9 8b fd        JMP        LAB_00101a27
+                 ff ff
+        00101c9c 0f              ??         0Fh
+        00101c9d 1f              ??         1Fh
+        00101c9e 40              ??         40h    @
+        00101c9f 00              ??         00h
+                             LAB_00101ca0                                    XREF[1]:     00101aae(j)  
+        00101ca0 0f b6 7a 03     MOVZX      EDI,byte ptr [RDX + 0x3]
+        00101ca4 ba 01 00        MOV        EDX,0x1
+                 00 00
+        00101ca9 e8 22 f4        CALL       <EXTERNAL>::write                                ssize_t write(int __fd, void * _
+                 ff ff
+        00101cae 48 83 f8 01     CMP        RAX,0x1
+        00101cb2 74 09           JZ         LAB_00101cbd
+        00101cb4 48 8b 44        MOV        RAX,qword ptr [RSP + ByteRIP]
+                 24 20
+        00101cb9 c6 40 03 00     MOV        byte ptr [RAX + 0x3],0x0
+                             LAB_00101cbd                                    XREF[1]:     00101cb2(j)  
+        00101cbd 48 8b 44        MOV        RAX,qword ptr [RSP + ByteRIP]
+                 24 20
+        00101cc2 48 8d 50 03     LEA        RDX,[RAX + 0x3]
+        00101cc6 e9 7a f6        JMP        LAB_00101345
+                 ff ff
+        00101ccb 0f              ??         0Fh
+        00101ccc 1f              ??         1Fh
+        00101ccd 44              ??         44h    D
+        00101cce 00              ??         00h
+        00101ccf 00              ??         00h
+                             LAB_00101cd0                                    XREF[1]:     00101825(j)  
+        00101cd0 44 8b 42 02     MOV        R8D,dword ptr [RDX + 0x2]
+        00101cd4 44 89 c0        MOV        EAX,R8D
+        00101cd7 f7 d0           NOT        EAX
+        00101cd9 83 e0 07        AND        EAX,0x7
+        00101cdc 48 c1 e0 02     SHL        RAX,0x2
+        00101ce0 48 8d 34 03     LEA        RSI,[RBX + RAX*0x1]
+        00101ce4 48 39 de        CMP        RSI,RBX
+        00101ce7 0f 86 ce        JBE        LAB_00101dbb
+                 00 00 00
+        00101ced 48 8d 78 ff     LEA        RDI,[RAX + -0x1]
+        00101cf1 48 89 f9        MOV        RCX,RDI
+        00101cf4 48 c1 e9 03     SHR        RCX,0x3
+        00101cf8 4c 8d 49 01     LEA        R9,[RCX + 0x1]
+        00101cfc 48 f7 d9        NEG        RCX
+        00101cff 4e 8d 14        LEA        R10,[R9*0x4]
+                 8d 00 00 
+                 00 00
+        00101d07 48 8d 0c 88     LEA        RCX,[RAX + RCX*0x4]
+        00101d0b 49 39 ca        CMP        R10,RCX
+        00101d0e 0f 8f c8        JG         LAB_001021dc
+                 04 00 00
+        00101d14 48 83 ff 17     CMP        RDI,0x17
+        00101d18 0f 86 be        JBE        LAB_001021dc
+                 04 00 00
+        00101d1e 4c 89 cf        MOV        RDI,R9
+        00101d21 48 8d 44        LEA        RAX,[RBX + RAX*0x1 + -0xc]
+                 03 f4
+        00101d26 48 89 d9        MOV        RCX,RBX
+        00101d29 48 c1 ef 02     SHR        RDI,0x2
+        00101d2d 49 89 c3        MOV        R11,RAX
+        00101d30 48 c1 e7 04     SHL        RDI,0x4
+        00101d34 49 29 fb        SUB        R11,RDI
+        00101d37 4c 89 df        MOV        RDI,R11
+        00101d3a 66 0f 1f        NOP        word ptr [RAX + RAX*0x1]
+                 44 00 00
+                             LAB_00101d40                                    XREF[1]:     00101d65(j)  
+        00101d40 66 0f 6f 01     MOVDQA     XMM0,xmmword ptr [RCX]=>local_3b78
+        00101d44 f3 0f 6f 20     MOVDQU     XMM4,xmmword ptr [RAX]
+        00101d48 48 83 e8 10     SUB        RAX,0x10
+        00101d4c 48 83 c1 10     ADD        RCX,0x10
+        00101d50 66 0f 70        PSHUFD     XMM1,XMM4,0x1b
+                 cc 1b
+        00101d55 66 0f 70        PSHUFD     XMM0,XMM0,0x1b
+                 c0 1b
+        00101d5a 0f 29 49 f0     MOVAPS     xmmword ptr [RCX + local_3b78[0]],XMM1
+        00101d5e 0f 11 40 10     MOVUPS     xmmword ptr [RAX + 0x10],XMM0
+        00101d62 48 39 f8        CMP        RAX,RDI
+        00101d65 75 d9           JNZ        LAB_00101d40
+        00101d67 4c 89 cf        MOV        RDI,R9
+        00101d6a 48 83 e7 fc     AND        RDI,-0x4
+        00101d6e 48 89 f8        MOV        RAX,RDI
+        00101d71 48 8d 0c bb     LEA        RCX,[RBX + RDI*0x4]
+        00101d75 48 f7 d8        NEG        RAX
+        00101d78 48 8d 04 86     LEA        RAX,[RSI + RAX*0x4]
+        00101d7c 49 39 f9        CMP        R9,RDI
+        00101d7f 74 3a           JZ         LAB_00101dbb
+        00101d81 8b 31           MOV        ESI,dword ptr [RCX]
+        00101d83 8b 38           MOV        EDI,dword ptr [RAX]
+        00101d85 89 39           MOV        dword ptr [RCX],EDI
+        00101d87 48 8d 79 04     LEA        RDI,[RCX + 0x4]
+        00101d8b 89 30           MOV        dword ptr [RAX],ESI
+        00101d8d 48 8d 70 fc     LEA        RSI,[RAX + -0x4]
+        00101d91 48 39 f7        CMP        RDI,RSI
+        00101d94 73 25           JNC        LAB_00101dbb
+        00101d96 8b 71 04        MOV        ESI,dword ptr [RCX + 0x4]
+        00101d99 8b 78 fc        MOV        EDI,dword ptr [RAX + -0x4]
+        00101d9c 89 79 04        MOV        dword ptr [RCX + 0x4],EDI
+        00101d9f 48 8d 79 08     LEA        RDI,[RCX + 0x8]
+        00101da3 89 70 fc        MOV        dword ptr [RAX + -0x4],ESI
+        00101da6 48 8d 70 f8     LEA        RSI,[RAX + -0x8]
+        00101daa 48 39 f7        CMP        RDI,RSI
+        00101dad 73 0c           JNC        LAB_00101dbb
+        00101daf 8b 71 08        MOV        ESI,dword ptr [RCX + 0x8]
+        00101db2 8b 78 f8        MOV        EDI,dword ptr [RAX + -0x8]
+        00101db5 89 79 08        MOV        dword ptr [RCX + 0x8],EDI
+        00101db8 89 70 f8        MOV        dword ptr [RAX + -0x8],ESI
+                             LAB_00101dbb                                    XREF[5]:     00101ce7(j), 00101d7f(j), 
+                                                                                          00101d94(j), 00101dad(j), 
+                                                                                          001021f7(j)  
+        00101dbb 41 83 e0 07     AND        R8D,0x7
+        00101dbf be 08 00        MOV        ESI,0x8
+                 00 00
+        00101dc4 48 8d 44        LEA        RAX=>local_3b68[12],[RSP + 0x1c]
+                 24 1c
+        00101dc9 44 29 c6        SUB        ESI,R8D
+        00101dcc 48 8d 3c b3     LEA        RDI,[RBX + RSI*0x4]
+        00101dd0 48 39 c7        CMP        RDI,RAX
+        00101dd3 0f 83 de        JNC        LAB_00101eb7
+                 00 00 00
+        00101dd9 4c 8d 44        LEA        R8=>local_3b68[11],[RSP + 0x1b]
+                 24 1b
+        00101dde 49 29 f8        SUB        R8,RDI
+        00101de1 4c 89 c1        MOV        RCX,R8
+        00101de4 48 c1 e9 03     SHR        RCX,0x3
+        00101de8 49 89 c9        MOV        R9,RCX
+        00101deb 48 8d 74        LEA        RSI,[RSI + RCX*0x1 + 0x1]
+                 0e 01
+        00101df0 49 f7 d9        NEG        R9
+        00101df3 48 c1 e6 02     SHL        RSI,0x2
+        00101df7 4e 8d 0c        LEA        R9,[0x1c + R9*0x4]
+                 8d 1c 00 
+                 00 00
+        00101dff 4c 39 ce        CMP        RSI,R9
+        00101e02 48 8d 74        LEA        RSI=>ByteRIP,[RSP + 0x20]
+                 24 20
+        00101e07 41 0f 9e c1     SETLE      R9B
+        00101e0b 48 39 f7        CMP        RDI,RSI
+        00101e0e 40 0f 93 c6     SETNC      SIL
+        00101e12 41 08 f1        OR         R9B,SIL
+        00101e15 0f 84 c5        JZ         LAB_00101ee0
+                 00 00 00
+        00101e1b 49 83 f8 17     CMP        R8,0x17
+        00101e1f 0f 86 bb        JBE        LAB_00101ee0
+                 00 00 00
+        00101e25 4c 8d 49 01     LEA        R9,[RCX + 0x1]
+        00101e29 48 8d 74        LEA        RSI=>local_3b68,[RSP + 0x10]
+                 24 10
+        00101e2e 48 89 f9        MOV        RCX,RDI
+        00101e31 4d 89 c8        MOV        R8,R9
+        00101e34 49 c1 e8 02     SHR        R8,0x2
+        00101e38 49 c1 e0 04     SHL        R8,0x4
+        00101e3c 49 01 f8        ADD        R8,RDI
+        00101e3f 90              NOP
+                             LAB_00101e40                                    XREF[1]:     00101e61(j)  
+        00101e40 f3 0f 6f 01     MOVDQU     XMM0,xmmword ptr [RCX]
+        00101e44 66 0f 70        PSHUFD     XMM1,xmmword ptr [RSI]=>local_3b68,0x1b
+                 0e 1b
+        00101e49 48 83 c1 10     ADD        RCX,0x10
+        00101e4d 0f 11 49 f0     MOVUPS     xmmword ptr [RCX + -0x10],XMM1
+        00101e51 48 83 ee 10     SUB        RSI,0x10
+        00101e55 66 0f 70        PSHUFD     XMM0,XMM0,0x1b
+                 c0 1b
+        00101e5a 0f 29 46 10     MOVAPS     xmmword ptr [RSI + local_3b68[0]],XMM0
+        00101e5e 49 39 c8        CMP        R8,RCX
+        00101e61 75 dd           JNZ        LAB_00101e40
+        00101e63 4c 89 ce        MOV        RSI,R9
+        00101e66 48 83 e6 fc     AND        RSI,-0x4
+        00101e6a 48 8d 0c b7     LEA        RCX,[RDI + RSI*0x4]
+        00101e6e 48 89 f7        MOV        RDI,RSI
+        00101e71 48 f7 df        NEG        RDI
+        00101e74 48 8d 04 b8     LEA        RAX,[RAX + RDI*0x4]
+        00101e78 49 39 f1        CMP        R9,RSI
+        00101e7b 74 3a           JZ         LAB_00101eb7
+        00101e7d 8b 31           MOV        ESI,dword ptr [RCX]
+        00101e7f 8b 38           MOV        EDI,dword ptr [RAX]
+        00101e81 89 39           MOV        dword ptr [RCX],EDI
+        00101e83 48 8d 79 04     LEA        RDI,[RCX + 0x4]
+        00101e87 89 30           MOV        dword ptr [RAX],ESI
+        00101e89 48 8d 70 fc     LEA        RSI,[RAX + -0x4]
+        00101e8d 48 39 f7        CMP        RDI,RSI
+        00101e90 73 25           JNC        LAB_00101eb7
+        00101e92 8b 71 04        MOV        ESI,dword ptr [RCX + 0x4]
+        00101e95 8b 78 fc        MOV        EDI,dword ptr [RAX + -0x4]
+        00101e98 89 79 04        MOV        dword ptr [RCX + 0x4],EDI
+        00101e9b 48 8d 79 08     LEA        RDI,[RCX + 0x8]
+        00101e9f 89 70 fc        MOV        dword ptr [RAX + -0x4],ESI
+        00101ea2 48 8d 70 f8     LEA        RSI,[RAX + -0x8]
+        00101ea6 48 39 f7        CMP        RDI,RSI
+        00101ea9 73 0c           JNC        LAB_00101eb7
+        00101eab 8b 71 08        MOV        ESI,dword ptr [RCX + 0x8]
+        00101eae 8b 78 f8        MOV        EDI,dword ptr [RAX + -0x8]
+        00101eb1 89 79 08        MOV        dword ptr [RCX + 0x8],EDI
+        00101eb4 89 70 f8        MOV        dword ptr [RAX + -0x8],ESI
+                             LAB_00101eb7                                    XREF[5]:     00101dd3(j), 00101e7b(j), 
+                                                                                          00101e90(j), 00101ea9(j), 
+                                                                                          00101ef7(j)  
+        00101eb7 66 0f 6f        MOVDQA     XMM0,xmmword ptr [RSP]=>local_3b78
+                 04 24
+        00101ebc 66 0f 70        PSHUFD     XMM1,xmmword ptr [RSP + local_3b68[0]],0x1b
+                 4c 24 10 1b
+        00101ec3 48 83 c2 05     ADD        RDX,0x5
+        00101ec7 0f 29 0c 24     MOVAPS     xmmword ptr [RSP]=>local_3b78,XMM1
+        00101ecb 66 0f 70        PSHUFD     XMM0,XMM0,0x1b
+                 c0 1b
+        00101ed0 0f 29 44        MOVAPS     xmmword ptr [RSP + local_3b68[0]],XMM0
+                 24 10
+        00101ed5 e9 6b f4        JMP        LAB_00101345
+                 ff ff
+        00101eda 66              ??         66h    f
+        00101edb 0f              ??         0Fh
+        00101edc 1f              ??         1Fh
+        00101edd 44              ??         44h    D
+        00101ede 00              ??         00h
+        00101edf 00              ??         00h
+                             LAB_00101ee0                                    XREF[3]:     00101e15(j), 00101e1f(j), 
+                                                                                          00101ef5(j)  
+        00101ee0 8b 0f           MOV        ECX,dword ptr [RDI]
+        00101ee2 8b 30           MOV        ESI,dword ptr [RAX]=>local_3b68[12]
+        00101ee4 48 83 c7 04     ADD        RDI,0x4
+        00101ee8 48 83 e8 04     SUB        RAX,0x4
+        00101eec 89 77 fc        MOV        dword ptr [RDI + -0x4],ESI
+        00101eef 89 48 04        MOV        dword ptr [RAX + local_3b68[12]],ECX
+        00101ef2 48 39 c7        CMP        RDI,RAX
+        00101ef5 72 e9           JC         LAB_00101ee0
+        00101ef7 eb be           JMP        LAB_00101eb7
+        00101ef9 0f              ??         0Fh
+        00101efa 1f              ??         1Fh
+        00101efb 80              ??         80h
+        00101efc 00              ??         00h
+        00101efd 00              ??         00h
+        00101efe 00              ??         00h
+        00101eff 00              ??         00h
+                             LAB_00101f00                                    XREF[1]:     00101aa5(j)  
+        00101f00 c0 e8 04        SHR        AL,0x4
+        00101f03 ba 01 00        MOV        EDX,0x1
+                 00 00
+        00101f08 83 e0 03        AND        EAX,0x3
+        00101f0b 0f b6 3c 84     MOVZX      EDI,byte ptr [RSP + RAX*0x4]
+        00101f0f e8 bc f1        CALL       <EXTERNAL>::write                                ssize_t write(int __fd, void * _
+                 ff ff
+        00101f14 48 83 f8 01     CMP        RAX,0x1
+        00101f18 74 09           JZ         LAB_00101f23
+        00101f1a 48 8b 44        MOV        RAX,qword ptr [RSP + ByteRIP]
+                 24 20
+        00101f1f c6 40 01 00     MOV        byte ptr [RAX + 0x1],0x0
+                             LAB_00101f23                                    XREF[1]:     00101f18(j)  
+        00101f23 48 8b 44        MOV        RAX,qword ptr [RSP + ByteRIP]
+                 24 20
+        00101f28 48 8d 50 01     LEA        RDX,[RAX + 0x1]
+        00101f2c e9 14 f4        JMP        LAB_00101345
+                 ff ff
+        00101f31 0f              ??         0Fh
+        00101f32 1f              ??         1Fh
+        00101f33 80              ??         80h
+        00101f34 00              ??         00h
+        00101f35 00              ??         00h
+        00101f36 00              ??         00h
+        00101f37 00              ??         00h
+                             LAB_00101f38                                    XREF[3]:     00101745(j), 0010174f(j), 
+                                                                                          00101f4d(j)  
+        00101f38 8b 0f           MOV        ECX,dword ptr [RDI]
+        00101f3a 8b 30           MOV        ESI,dword ptr [RAX]=>local_3b68[12]
+        00101f3c 48 83 c7 04     ADD        RDI,0x4
+        00101f40 48 83 e8 04     SUB        RAX,0x4
+        00101f44 89 77 fc        MOV        dword ptr [RDI + -0x4],ESI
+        00101f47 89 48 04        MOV        dword ptr [RAX + local_3b68[12]],ECX
+        00101f4a 48 39 f8        CMP        RAX,RDI
+        00101f4d 77 e9           JA         LAB_00101f38
+        00101f4f e9 93 f8        JMP        LAB_001017e7
+                 ff ff
+        00101f54 0f              ??         0Fh
+        00101f55 1f              ??         1Fh
+        00101f56 40              ??         40h    @
+        00101f57 00              ??         00h
+                             LAB_00101f58                                    XREF[1]:     00101851(j)  
+        00101f58 48 39 de        CMP        RSI,RBX
+        00101f5b 0f 86 ca        JBE        LAB_0010202b
+                 00 00 00
+        00101f61 48 8d 78 ff     LEA        RDI,[RAX + -0x1]
+        00101f65 48 89 f9        MOV        RCX,RDI
+        00101f68 48 c1 e9 03     SHR        RCX,0x3
+        00101f6c 4c 8d 49 01     LEA        R9,[RCX + 0x1]
+        00101f70 48 f7 d9        NEG        RCX
+        00101f73 4e 8d 14        LEA        R10,[R9*0x4]
+                 8d 00 00 
+                 00 00
+        00101f7b 48 8d 0c 88     LEA        RCX,[RAX + RCX*0x4]
+        00101f7f 49 39 ca        CMP        R10,RCX
+        00101f82 0f 8f 2d        JG         LAB_001021b5
+                 02 00 00
+        00101f88 48 83 ff 17     CMP        RDI,0x17
+        00101f8c 0f 86 23        JBE        LAB_001021b5
+                 02 00 00
+        00101f92 4c 89 cf        MOV        RDI,R9
+        00101f95 48 8d 44        LEA        RAX,[RBX + RAX*0x1 + -0xc]
+                 03 f4
+        00101f9a 48 89 d9        MOV        RCX,RBX
+        00101f9d 48 c1 ef 02     SHR        RDI,0x2
+        00101fa1 49 89 c3        MOV        R11,RAX
+        00101fa4 48 c1 e7 04     SHL        RDI,0x4
+        00101fa8 49 29 fb        SUB        R11,RDI
+        00101fab 4c 89 df        MOV        RDI,R11
+        00101fae 66 90           NOP
+                             LAB_00101fb0                                    XREF[1]:     00101fd5(j)  
+        00101fb0 66 0f 6f 01     MOVDQA     XMM0,xmmword ptr [RCX]=>local_3b78
+        00101fb4 f3 0f 6f 18     MOVDQU     XMM3,xmmword ptr [RAX]
+        00101fb8 48 83 e8 10     SUB        RAX,0x10
+        00101fbc 48 83 c1 10     ADD        RCX,0x10
+        00101fc0 66 0f 70        PSHUFD     XMM1,XMM3,0x1b
+                 cb 1b
+        00101fc5 66 0f 70        PSHUFD     XMM0,XMM0,0x1b
+                 c0 1b
+        00101fca 0f 29 49 f0     MOVAPS     xmmword ptr [RCX + local_3b78[0]],XMM1
+        00101fce 0f 11 40 10     MOVUPS     xmmword ptr [RAX + 0x10],XMM0
+        00101fd2 48 39 f8        CMP        RAX,RDI
+        00101fd5 75 d9           JNZ        LAB_00101fb0
+        00101fd7 4c 89 cf        MOV        RDI,R9
+        00101fda 48 83 e7 fc     AND        RDI,-0x4
+        00101fde 48 89 f8        MOV        RAX,RDI
+        00101fe1 48 8d 0c bb     LEA        RCX,[RBX + RDI*0x4]
+        00101fe5 48 f7 d8        NEG        RAX
+        00101fe8 48 8d 04 86     LEA        RAX,[RSI + RAX*0x4]
+        00101fec 49 39 f9        CMP        R9,RDI
+        00101fef 74 3a           JZ         LAB_0010202b
+        00101ff1 8b 31           MOV        ESI,dword ptr [RCX]
+        00101ff3 8b 38           MOV        EDI,dword ptr [RAX]
+        00101ff5 89 39           MOV        dword ptr [RCX],EDI
+        00101ff7 48 8d 79 04     LEA        RDI,[RCX + 0x4]
+        00101ffb 89 30           MOV        dword ptr [RAX],ESI
+        00101ffd 48 8d 70 fc     LEA        RSI,[RAX + -0x4]
+        00102001 48 39 f7        CMP        RDI,RSI
+        00102004 73 25           JNC        LAB_0010202b
+        00102006 8b 71 04        MOV        ESI,dword ptr [RCX + 0x4]
+        00102009 8b 78 fc        MOV        EDI,dword ptr [RAX + -0x4]
+        0010200c 89 79 04        MOV        dword ptr [RCX + 0x4],EDI
+        0010200f 48 8d 79 08     LEA        RDI,[RCX + 0x8]
+        00102013 89 70 fc        MOV        dword ptr [RAX + -0x4],ESI
+        00102016 48 8d 70 f8     LEA        RSI,[RAX + -0x8]
+        0010201a 48 39 f7        CMP        RDI,RSI
+        0010201d 73 0c           JNC        LAB_0010202b
+        0010201f 8b 71 08        MOV        ESI,dword ptr [RCX + 0x8]
+        00102022 8b 78 f8        MOV        EDI,dword ptr [RAX + -0x8]
+        00102025 89 79 08        MOV        dword ptr [RCX + 0x8],EDI
+        00102028 89 70 f8        MOV        dword ptr [RAX + -0x8],ESI
+                             LAB_0010202b                                    XREF[5]:     00101f5b(j), 00101fef(j), 
+                                                                                          00102004(j), 0010201d(j), 
+                                                                                          001021d7(j)  
+        0010202b be 08 00        MOV        ESI,0x8
+                 00 00
+        00102030 48 8d 44        LEA        RAX=>local_3b68[12],[RSP + 0x1c]
+                 24 1c
+        00102035 44 29 c6        SUB        ESI,R8D
+        00102038 48 8d 3c b3     LEA        RDI,[RBX + RSI*0x4]
+        0010203c 48 39 c7        CMP        RDI,RAX
+        0010203f 0f 83 e2        JNC        LAB_00102127
+                 00 00 00
+        00102045 4c 8d 44        LEA        R8=>local_3b68[11],[RSP + 0x1b]
+                 24 1b
+        0010204a 49 29 f8        SUB        R8,RDI
+        0010204d 4c 89 c1        MOV        RCX,R8
+        00102050 48 c1 e9 03     SHR        RCX,0x3
+        00102054 49 89 c9        MOV        R9,RCX
+        00102057 48 8d 74        LEA        RSI,[RSI + RCX*0x1 + 0x1]
+                 0e 01
+        0010205c 49 f7 d9        NEG        R9
+        0010205f 48 c1 e6 02     SHL        RSI,0x2
+        00102063 4e 8d 0c        LEA        R9,[0x1c + R9*0x4]
+                 8d 1c 00 
+                 00 00
+        0010206b 4c 39 ce        CMP        RSI,R9
+        0010206e 48 8d 74        LEA        RSI=>ByteRIP,[RSP + 0x20]
+                 24 20
+        00102073 41 0f 9e c1     SETLE      R9B
+        00102077 48 39 f7        CMP        RDI,RSI
+        0010207a 40 0f 93 c6     SETNC      SIL
+        0010207e 41 08 f1        OR         R9B,SIL
+        00102081 0f 84 c9        JZ         LAB_00102150
+                 00 00 00
+        00102087 49 83 f8 17     CMP        R8,0x17
+        0010208b 0f 86 bf        JBE        LAB_00102150
+                 00 00 00
+        00102091 4c 8d 49 01     LEA        R9,[RCX + 0x1]
+        00102095 48 8d 74        LEA        RSI=>local_3b68,[RSP + 0x10]
+                 24 10
+        0010209a 48 89 f9        MOV        RCX,RDI
+        0010209d 4d 89 c8        MOV        R8,R9
+        001020a0 49 c1 e8 02     SHR        R8,0x2
+        001020a4 49 c1 e0 04     SHL        R8,0x4
+        001020a8 49 01 f8        ADD        R8,RDI
+        001020ab 0f 1f 44        NOP        dword ptr [RAX + RAX*0x1]
+                 00 00
+                             LAB_001020b0                                    XREF[1]:     001020d1(j)  
+        001020b0 f3 0f 6f 01     MOVDQU     XMM0,xmmword ptr [RCX]
+        001020b4 66 0f 70        PSHUFD     XMM1,xmmword ptr [RSI]=>local_3b68,0x1b
+                 0e 1b
+        001020b9 48 83 c1 10     ADD        RCX,0x10
+        001020bd 0f 11 49 f0     MOVUPS     xmmword ptr [RCX + -0x10],XMM1
+        001020c1 48 83 ee 10     SUB        RSI,0x10
+        001020c5 66 0f 70        PSHUFD     XMM0,XMM0,0x1b
+                 c0 1b
+        001020ca 0f 29 46 10     MOVAPS     xmmword ptr [RSI + local_3b68[0]],XMM0
+        001020ce 49 39 c8        CMP        R8,RCX
+        001020d1 75 dd           JNZ        LAB_001020b0
+        001020d3 4c 89 ce        MOV        RSI,R9
+        001020d6 48 83 e6 fc     AND        RSI,-0x4
+        001020da 48 8d 0c b7     LEA        RCX,[RDI + RSI*0x4]
+        001020de 48 89 f7        MOV        RDI,RSI
+        001020e1 48 f7 df        NEG        RDI
+        001020e4 48 8d 04 b8     LEA        RAX,[RAX + RDI*0x4]
+        001020e8 49 39 f1        CMP        R9,RSI
+        001020eb 74 3a           JZ         LAB_00102127
+        001020ed 8b 31           MOV        ESI,dword ptr [RCX]
+        001020ef 8b 38           MOV        EDI,dword ptr [RAX]
+        001020f1 89 39           MOV        dword ptr [RCX],EDI
+        001020f3 48 8d 78 fc     LEA        RDI,[RAX + -0x4]
+        001020f7 89 30           MOV        dword ptr [RAX],ESI
+        001020f9 48 8d 71 04     LEA        RSI,[RCX + 0x4]
+        001020fd 48 39 f7        CMP        RDI,RSI
+        00102100 76 25           JBE        LAB_00102127
+        00102102 8b 71 04        MOV        ESI,dword ptr [RCX + 0x4]
+        00102105 8b 78 fc        MOV        EDI,dword ptr [RAX + -0x4]
+        00102108 89 79 04        MOV        dword ptr [RCX + 0x4],EDI
+        0010210b 48 8d 79 08     LEA        RDI,[RCX + 0x8]
+        0010210f 89 70 fc        MOV        dword ptr [RAX + -0x4],ESI
+        00102112 48 8d 70 f8     LEA        RSI,[RAX + -0x8]
+        00102116 48 39 f7        CMP        RDI,RSI
+        00102119 73 0c           JNC        LAB_00102127
+        0010211b 8b 71 08        MOV        ESI,dword ptr [RCX + 0x8]
+        0010211e 8b 78 f8        MOV        EDI,dword ptr [RAX + -0x8]
+        00102121 89 79 08        MOV        dword ptr [RCX + 0x8],EDI
+        00102124 89 70 f8        MOV        dword ptr [RAX + -0x8],ESI
+                             LAB_00102127                                    XREF[5]:     0010203f(j), 001020eb(j), 
+                                                                                          00102100(j), 00102119(j), 
+                                                                                          00102167(j)  
+        00102127 66 0f 6f        MOVDQA     XMM0,xmmword ptr [RSP]=>local_3b78
+                 04 24
+        0010212c 66 0f 70        PSHUFD     XMM1,xmmword ptr [RSP + local_3b68[0]],0x1b
+                 4c 24 10 1b
+        00102133 48 83 c2 03     ADD        RDX,0x3
+        00102137 0f 29 0c 24     MOVAPS     xmmword ptr [RSP]=>local_3b78,XMM1
+        0010213b 66 0f 70        PSHUFD     XMM0,XMM0,0x1b
+                 c0 1b
+        00102140 0f 29 44        MOVAPS     xmmword ptr [RSP + local_3b68[0]],XMM0
+                 24 10
+        00102145 e9 fb f1        JMP        LAB_00101345
+                 ff ff
+        0010214a 66              ??         66h    f
+        0010214b 0f              ??         0Fh
+        0010214c 1f              ??         1Fh
+        0010214d 44              ??         44h    D
+        0010214e 00              ??         00h
+        0010214f 00              ??         00h
+                             LAB_00102150                                    XREF[3]:     00102081(j), 0010208b(j), 
+                                                                                          00102165(j)  
+        00102150 8b 0f           MOV        ECX,dword ptr [RDI]
+        00102152 8b 30           MOV        ESI,dword ptr [RAX]=>local_3b68[12]
+        00102154 48 83 c7 04     ADD        RDI,0x4
+        00102158 48 83 e8 04     SUB        RAX,0x4
+        0010215c 89 77 fc        MOV        dword ptr [RDI + -0x4],ESI
+        0010215f 89 48 04        MOV        dword ptr [RAX + local_3b68[12]],ECX
+        00102162 48 39 c7        CMP        RDI,RAX
+        00102165 72 e9           JC         LAB_00102150
+        00102167 eb be           JMP        LAB_00102127
+        00102169 0f              ??         0Fh
+        0010216a 1f              ??         1Fh
+        0010216b 80              ??         80h
+        0010216c 00              ??         00h
+        0010216d 00              ??         00h
+        0010216e 00              ??         00h
+        0010216f 00              ??         00h
+                             LAB_00102170                                    XREF[1]:     0010143e(j)  
+        00102170 48 83 c2 0a     ADD        RDX,0xa
+        00102174 e9 cc f1        JMP        LAB_00101345
+                 ff ff
+        00102179 0f              ??         0Fh
+        0010217a 1f              ??         1Fh
+        0010217b 80              ??         80h
+        0010217c 00              ??         00h
+        0010217d 00              ??         00h
+        0010217e 00              ??         00h
+        0010217f 00              ??         00h
+                             LAB_00102180                                    XREF[1]:     00101ab7(j)  
+        00102180 c0 e8 06        SHR        AL,0x6
+        00102183 0f b6 7a 02     MOVZX      EDI,byte ptr [RDX + 0x2]
+        00102187 ba 01 00        MOV        EDX,0x1
+                 00 00
+        0010218c 0f b6 c0        MOVZX      EAX,AL
+        0010218f 48 8d 34 83     LEA        RSI,[RBX + RAX*0x4]
+        00102193 e8 38 ef        CALL       <EXTERNAL>::write                                ssize_t write(int __fd, void * _
+                 ff ff
+        00102198 48 83 f8 01     CMP        RAX,0x1
+        0010219c 74 09           JZ         LAB_001021a7
+        0010219e 48 8b 44        MOV        RAX,qword ptr [RSP + ByteRIP]
+                 24 20
+        001021a3 c6 40 02 00     MOV        byte ptr [RAX + 0x2],0x0
+                             LAB_001021a7                                    XREF[1]:     0010219c(j)  
+        001021a7 48 8b 44        MOV        RAX,qword ptr [RSP + ByteRIP]
+                 24 20
+        001021ac 48 8d 50 02     LEA        RDX,[RAX + 0x2]
+        001021b0 e9 90 f1        JMP        LAB_00101345
+                 ff ff
+                             LAB_001021b5                                    XREF[2]:     00101f82(j), 00101f8c(j)  
+        001021b5 48 89 d8        MOV        RAX,RBX
+        001021b8 0f 1f 84        NOP        dword ptr [RAX + RAX*0x1]
+                 00 00 00 
+                 00 00
+                             LAB_001021c0                                    XREF[1]:     001021d5(j)  
+        001021c0 8b 08           MOV        ECX,dword ptr [RAX]=>local_3b78
+        001021c2 8b 3e           MOV        EDI,dword ptr [RSI]
+        001021c4 48 83 c0 04     ADD        RAX,0x4
+        001021c8 48 83 ee 04     SUB        RSI,0x4
+        001021cc 89 78 fc        MOV        dword ptr [RAX + local_3b78[0]],EDI
+        001021cf 89 4e 04        MOV        dword ptr [RSI + 0x4],ECX
+        001021d2 48 39 f0        CMP        RAX,RSI
+        001021d5 72 e9           JC         LAB_001021c0
+        001021d7 e9 4f fe        JMP        LAB_0010202b
+                 ff ff
+                             LAB_001021dc                                    XREF[2]:     00101d0e(j), 00101d18(j)  
+        001021dc 48 89 d8        MOV        RAX,RBX
+        001021df 90              NOP
+                             LAB_001021e0                                    XREF[1]:     001021f5(j)  
+        001021e0 8b 08           MOV        ECX,dword ptr [RAX]=>local_3b78
+        001021e2 8b 3e           MOV        EDI,dword ptr [RSI]
+        001021e4 48 83 c0 04     ADD        RAX,0x4
+        001021e8 48 83 ee 04     SUB        RSI,0x4
+        001021ec 89 78 fc        MOV        dword ptr [RAX + local_3b78[0]],EDI
+        001021ef 89 4e 04        MOV        dword ptr [RSI + 0x4],ECX
+        001021f2 48 39 f0        CMP        RAX,RSI
+        001021f5 72 e9           JC         LAB_001021e0
+        001021f7 e9 bf fb        JMP        LAB_00101dbb
+                 ff ff
+                             LAB_001021fc                                    XREF[2]:     0010163e(j), 00101648(j)  
+        001021fc 48 89 d8        MOV        RAX,RBX
+        001021ff 90              NOP
+                             LAB_00102200                                    XREF[1]:     00102215(j)  
+        00102200 8b 08           MOV        ECX,dword ptr [RAX]=>local_3b78
+        00102202 8b 3e           MOV        EDI,dword ptr [RSI]
+        00102204 48 83 c0 04     ADD        RAX,0x4
+        00102208 48 83 ee 04     SUB        RSI,0x4
+        0010220c 89 78 fc        MOV        dword ptr [RAX + local_3b78[0]],EDI
+        0010220f 89 4e 04        MOV        dword ptr [RSI + 0x4],ECX
+        00102212 48 39 f0        CMP        RAX,RSI
+        00102215 72 e9           JC         LAB_00102200
+        00102217 e9 cf f4        JMP        LAB_001016eb
+                 ff ff
+                             LAB_0010221c                                    XREF[2]:     00101881(j), 0010188b(j)  
+        0010221c 48 89 d8        MOV        RAX,RBX
+        0010221f 90              NOP
+                             LAB_00102220                                    XREF[1]:     00102235(j)  
+        00102220 8b 08           MOV        ECX,dword ptr [RAX]=>local_3b78
+        00102222 8b 3e           MOV        EDI,dword ptr [RSI]
+        00102224 48 83 c0 04     ADD        RAX,0x4
+        00102228 48 83 ee 04     SUB        RSI,0x4
+        0010222c 89 78 fc        MOV        dword ptr [RAX + local_3b78[0]],EDI
+        0010222f 89 4e 04        MOV        dword ptr [RSI + 0x4],ECX
+        00102232 48 39 f0        CMP        RAX,RSI
+        00102235 72 e9           JC         LAB_00102220
+        00102237 e9 ef f6        JMP        LAB_0010192b
+                 ff ff
+                             LAB_0010223c                                    XREF[1]:     00101551(j)  
+        0010223c e8 9f ee        CALL       <EXTERNAL>::__stack_chk_fail                     undefined __stack_chk_fail()
+                 ff ff
+                             -- Flow Override: CALL_RETURN (CALL_TERMINATOR)
+
+
+
+        if (bVar11 == 0xd5) {
+          byeRIP = pbVar23 + 2;
+          bVar11 = pbVar23[1] & 3;
+          if (bVar11 == 2) {
+
+            uVar5 = *(uint *)(pbVar23 + 2);
+            uVar16 = (ulong)(~uVar5 & 7);
+            lVar14 = uVar16 * 4;
+            puVar25 = (undefined4 *)(local_3b78 + lVar14);
+
+            if (local_3b78 < puVar25) {
+              uVar21 = lVar14 - 1U >> 3;
+              uVar24 = uVar21 + 1;
+              lVar2 = lVar14 + uVar21 * -4;
+              puVar17 = (undefined4 *)local_3b78;
+
+              if ((uVar24 * 4 - lVar2 == 0 || (long)(uVar24 * 4) < lVar2) &&
+                 (puVar17 = (undefined4 *)local_3b78, 0x17 < lVar14 - 1U)) {
+                puVar17 = &uStack15236 + uVar16;
+                pauVar22 = (undefined (*) [16])local_3b78;
+
+                do {
+                  uVar4 = *(undefined4 *)*pauVar22;
+                  uVar6 = *(undefined4 *)(*pauVar22 + 4);
+                  uVar7 = *(undefined4 *)(*pauVar22 + 8);
+                  uVar8 = *(undefined4 *)(*pauVar22 + 0xc);
+                  puVar13 = puVar17 + -4;
+                  *pauVar22 = CONCAT412(*puVar17,CONCAT48(puVar17[1],CONCAT44(puVar17[2],puVar17[3])
+                                                         ));
+                  *puVar17 = uVar8;
+                  puVar17[1] = uVar7;
+                  puVar17[2] = uVar6;
+                  puVar17[3] = uVar4;
+                  puVar17 = puVar13;
+                  pauVar22 = pauVar22[1];
+
+                } while (puVar13 != &uStack15236 + uVar16 + (uVar24 >> 2) * -4);
+                uVar16 = uVar24 & 0xfffffffffffffffc;
+                puVar25 = puVar25 + -uVar16;
+
+                if (uVar24 != uVar16) {
+                  uVar4 = *(undefined4 *)(local_3b78 + uVar16 * 4);
+                  *(undefined4 *)(local_3b78 + uVar16 * 4) = *puVar25;
+                  *puVar25 = uVar4;
+
+                  if (auStack15220 + uVar16 < puVar25 + -1) {
+                    uVar4 = auStack15220[uVar16];
+                    auStack15220[uVar16] = puVar25[-1];
+                    puVar25[-1] = uVar4;
+
+                    if (auStack15220 + uVar16 + 1 < puVar25 + -2) {
+                      uVar4 = auStack15220[uVar16 + 1];
+                      auStack15220[uVar16 + 1] = puVar25[-2];
+                      puVar25[-2] = uVar4;
+                    }
+                  }
+                }
+              }
+              else {
+                do {
+                  uVar4 = *puVar17;
+                  puVar13 = puVar17 + 1;
+                  puVar26 = puVar25 + -1;
+                  *puVar17 = *puVar25;
+                  *puVar25 = uVar4;
+                  puVar17 = puVar13;
+                  puVar25 = puVar26;
+                } while (puVar13 < puVar26);
+              }
+            }
+            uVar16 = (ulong)(8 - (uVar5 & 7));
+            pauVar22 = (undefined (*) [16])(local_3b78 + uVar16 * 4);
+            if (pauVar22 < (undefined (*) [16])&uStack15196) {
+              uVar24 = (ulong)((undefined *)((long)register0x00000020 + -0x3b60) +
+                              (3 - (long)pauVar22)) >> 3;
+              pauVar18 = (undefined (*) [16])&uStack15196;
+              if (((long)(uVar24 * -4 + 0x1c) < (long)((uVar16 + 1 + uVar24) * 4) &&
+                   pauVar22 < (undefined (*) [16])&byeRIP) ||
+                 ((undefined *)((long)register0x00000020 + -0x3b60) + (3 - (long)pauVar22) <
+                  (undefined *)0x18)) {
+                do {
+                  uVar4 = *(undefined4 *)*pauVar22;
+                  puVar9 = *pauVar22;
+                  pauVar20 = pauVar18[-1];
+                  *(undefined4 *)*pauVar22 = *(undefined4 *)*pauVar18;
+                  *(undefined4 *)*pauVar18 = uVar4;
+                  pauVar18 = (undefined (*) [16])(*pauVar20 + 0xc);
+                  pauVar22 = (undefined (*) [16])(puVar9 + 4);
+                } while ((undefined (*) [16])(puVar9 + 4) < (undefined (*) [16])(*pauVar20 + 0xc));
+              }
+              else {
+                uVar24 = uVar24 + 1;
+                pauVar18 = pauVar22;
+                puVar25 = (undefined4 *)local_3b68;
+                do {
+                  uVar4 = *(undefined4 *)*pauVar18;
+                  uVar6 = *(undefined4 *)(*pauVar18 + 4);
+                  uVar7 = *(undefined4 *)(*pauVar18 + 8);
+                  uVar8 = *(undefined4 *)(*pauVar18 + 0xc);
+                  pauVar20 = pauVar18[1];
+                  *pauVar18 = CONCAT412(*puVar25,CONCAT48(puVar25[1],CONCAT44(puVar25[2],puVar25[3])
+                                                         ));
+                  *puVar25 = uVar8;
+                  puVar25[1] = uVar7;
+                  puVar25[2] = uVar6;
+                  puVar25[3] = uVar4;
+                  pauVar18 = pauVar20;
+                  puVar25 = puVar25 + -4;
+                } while (pauVar22[uVar24 >> 2] != pauVar20);
+                uVar16 = uVar24 & 0xfffffffffffffffc;
+                puVar25 = (undefined4 *)(*pauVar22 + uVar16 * 4);
+                lVar14 = uVar16 * -4;
+                puVar17 = (undefined4 *)((long)(undefined (*) [16])&uStack15196 + lVar14);
+                if (uVar24 != uVar16) {
+                  uVar4 = *puVar25;
+                  *puVar25 = *puVar17;
+                  *puVar17 = uVar4;
+                  if (puVar25 + 1 < (undefined *)((long)register0x00000020 + -0x3b60) + lVar14) {
+                    uVar4 = puVar25[1];
+                    puVar25[1] = *(undefined4 *)
+                                  ((undefined *)((long)register0x00000020 + -0x3b60) + lVar14);
+                    *(undefined4 *)((undefined *)((long)register0x00000020 + -0x3b60) + lVar14) =
+                         uVar4;
+                    if (puVar25 + 2 < auStack15204 + -uVar16) {
+                      uVar4 = puVar25[2];
+                      puVar25[2] = auStack15204[-uVar16];
+                      auStack15204[-uVar16] = uVar4;
+                    }
+                  }
+                }
+              }
+            }
+            byeRIP = pbVar23 + 5;
+            _local_3b78 = CONCAT412(local_3b68,
+                                    CONCAT48(auStack15204[0],CONCAT44(auStack15204[1],uStack15196)))
+            ;
+            _local_3b68 = CONCAT44(auStack15220[1],auStack15220[2]);
+            _local_3b68 = CONCAT48(auStack15220[0],_local_3b68);
+            _local_3b68 = CONCAT412(local_3b78,_local_3b68);
+          }
+          else if (bVar11 == 3) {
+           
+
+
+
+
+
+
+
+            uVar5 = *(uint *)(pbVar23 + 2);
+            uVar16 = (ulong)(~uVar5 & 7);
+            lVar14 = uVar16 * 4;
+            puVar25 = (undefined4 *)(local_3b78 + lVar14);
+            if (local_3b78 < puVar25) {
+              uVar21 = lVar14 - 1U >> 3;
+              uVar24 = uVar21 + 1;
+              lVar2 = lVar14 + uVar21 * -4;
+              puVar17 = (undefined4 *)local_3b78;
+              if ((uVar24 * 4 - lVar2 == 0 || (long)(uVar24 * 4) < lVar2) &&
+                 (puVar17 = (undefined4 *)local_3b78, 0x17 < lVar14 - 1U)) {
+                puVar17 = &uStack15236 + uVar16;
+                pauVar22 = (undefined (*) [16])local_3b78;
+                do {
+                  uVar4 = *(undefined4 *)*pauVar22;
+                  uVar6 = *(undefined4 *)(*pauVar22 + 4);
+                  uVar7 = *(undefined4 *)(*pauVar22 + 8);
+                  uVar8 = *(undefined4 *)(*pauVar22 + 0xc);
+                  puVar13 = puVar17 + -4;
+                  *pauVar22 = CONCAT412(*puVar17,CONCAT48(puVar17[1],CONCAT44(puVar17[2],puVar17[3])
+                                                         ));
+                  *puVar17 = uVar8;
+                  puVar17[1] = uVar7;
+                  puVar17[2] = uVar6;
+                  puVar17[3] = uVar4;
+                  puVar17 = puVar13;
+                  pauVar22 = pauVar22[1];
+                } while (&uStack15236 + uVar16 + (uVar24 >> 2) * -4 != puVar13);
+                uVar16 = uVar24 & 0xfffffffffffffffc;
+                puVar25 = puVar25 + -uVar16;
+                if (uVar24 != uVar16) {
+                  uVar4 = *(undefined4 *)(local_3b78 + uVar16 * 4);
+                  *(undefined4 *)(local_3b78 + uVar16 * 4) = *puVar25;
+                  *puVar25 = uVar4;
+                  if (auStack15220 + uVar16 < puVar25 + -1) {
+                    uVar4 = auStack15220[uVar16];
+                    auStack15220[uVar16] = puVar25[-1];
+                    puVar25[-1] = uVar4;
+                    if (auStack15220 + uVar16 + 1 < puVar25 + -2) {
+                      uVar4 = auStack15220[uVar16 + 1];
+                      auStack15220[uVar16 + 1] = puVar25[-2];
+                      puVar25[-2] = uVar4;
+                    }
+                  }
+                }
+              }
+              else {
+                do {
+                  uVar4 = *puVar17;
+                  puVar13 = puVar17 + 1;
+                  puVar26 = puVar25 + -1;
+                  *puVar17 = *puVar25;
+                  *puVar25 = uVar4;
+                  puVar17 = puVar13;
+                  puVar25 = puVar26;
+                } while (puVar13 < puVar26);
+              }
+            }
+
+
+
+
+//d5
+if([ByteRIP - 1] & 3 == 2){
+    if(rsi <= rbx){//rbx == rsp
+        //there are statements in here
+    }    
+    else{
+        if(r10 > rcx || rdi <= 0x17){
+
+        }
+        else{
+            do while(rax < rsi){
+
+            }
+            if(rdi >= rax){
+                //some stuff
+            }
+            if(r9b|sil == 0 || r8 <= 0x17){
+                do while(rdi < rax){
+                    //some stuff
+                }
+                //som stuff
+            }
+            else{
+                do while(rcx != r8){
+                    //some stuff
+                }
+                //some stuff
+            }
+        }
+    }
+}
+
+
+else if([ByteRIP - 1] & 3 == 3){
+    if(rsi <= rbx){//rbx == rsp
+        if(rdi >= rax){
+            //some stuff
+        }
+        else{
+            if(r9b|sil == 0 || r8 <= 0x17){
+                do while(rax > rdi){
+                    //some stuff
+                }
+                //som stuff
+            }
+            else{
+                do while(rcx != r8){
+                    //some stuff
+                }
+                //some stuff
+            }
+        }
+    }
+    else{
+        if(r10 > rcx || rdi <= 0x17){
+            do while(rax < rsi){
+
+            }
+
+            if(rdi >= rax){
+                //some stuff
+            }
+            else{
+                if(r9b|sil == 0 || r8 <= 0x17){
+                    do while(rax > rdi){
+                        //some stuff
+                    }
+                    //som stuff
+                }
+                else{
+                    do while(rcx != r8){
+                        //some stuff
+                    }
+                    //some stuff
+                }//btw det her er det samme som det over
+            }
+        }
+        else{
+            do while(rdi != rax){
+
+            }
+            //some stuff where there are a little that is getting skipped
+            if(rdi >= rax){
+                //some stuff
+            }
+            else{
+                if(r9b|sil == 0 || r8 <= 0x17){
+                    do while(rax < rsi){
+                        //some stuff
+                    }
+                    //som stuff
+                }
+                else{
+                    do while(rcx != r8){
+                        //some stuff
+                    }
+                    //some stuff
+                }//btw det her er det samme som det over
+            }
+        }
+    }
+}
+else{
+    //bliver ikke kaldt
+}
+
+
+
+
