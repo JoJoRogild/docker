@@ -974,21 +974,22 @@ var2 = 0
 var3 = 0
 var4 = 0
 command = ""
+ins = 0
 while(RIP < len(v4)):
 	command = v4[RIP:RIP+2]
 	if(command == "f6"):#mov ins
 		if (int(v4[RIP+2:RIP+4], 16) & 3 == 2):
-			print(str(hex(int(RIP / 2))) + " mov var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + " " + v4[RIP+4:RIP+12])
+			print(str(ins) + " " + str(hex(int(RIP / 2))) + " mov var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + " " + v4[RIP+4:RIP+12])
 			RIP += 12
 		elif(int(v4[RIP+2:RIP+4], 16) & 3 == 0):
-			print(str(hex(int(RIP / 2))) + " mov var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + ", var" + str((int(v4[RIP+2:RIP+4], 16) >> 6) & 3) )
+			print(str(ins) + " " + str(hex(int(RIP / 2))) + " mov var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + ", var" + str((int(v4[RIP+2:RIP+4], 16) >> 6) & 3) )
 			RIP += 10
 		else:
 			print("error f6 at: " + str(RIP))
 			break
 	elif(command == "ef"):#write ins
 		if (int(v4[RIP+2:RIP+4], 16) & 3 == 1):
-			print(str(hex(int(RIP / 2))) + " write(" + str((int(v4[RIP+4:RIP+6], 16))) + ", var" + str((int(v4[RIP+2:RIP+4], 16) >> 6)) + ", 1)")
+			print(str(ins) + " " + str(hex(int(RIP / 2))) + " write(" + str((int(v4[RIP+4:RIP+6], 16))) + ", var" + str((int(v4[RIP+2:RIP+4], 16) >> 6)) + ", 1)")
 			RIP += 8
 			
 		else:
@@ -996,86 +997,87 @@ while(RIP < len(v4)):
 			break
 	elif(command == "aa"):#sub ins
 		if (int(v4[RIP+2:RIP+4], 16) & 3 == 2):
-			print(str(hex(int(RIP / 2))) + " sub var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + ", " + v4[RIP+4:RIP+12])
+			print(str(ins) + " " + str(hex(int(RIP / 2))) + " sub var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + ", " + v4[RIP+4:RIP+12])
 			RIP += 16
 		elif(int(v4[RIP+2:RIP+4], 16) & 3 == 0):
-			print(str(hex(int(RIP / 2))) + " sub var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + ", var" + str((int(v4[RIP+2:RIP+4], 16) >> 6) & 3))
+			print(str(ins) + " " + str(hex(int(RIP / 2))) + " sub var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + ", var" + str((int(v4[RIP+2:RIP+4], 16) >> 6) & 3))
 			RIP += 6
 		else:
 			print("error at aa: " + str(RIP))
 			break
 	elif(command == "5d"):#read ins
 		if (int(v4[RIP+2:RIP+4], 16) & 3 == 0):
-			print(str(hex(int(RIP / 2))) + " read(0, var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + ", var" + str((int(v4[RIP+2:RIP+4], 16) >> 6) & 3) + ")")
+			print(str(ins) + " " + str(hex(int(RIP / 2))) + " read(0, var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + ", var" + str((int(v4[RIP+2:RIP+4], 16) >> 6) & 3) + ")")
 			RIP += 6
 		else:
 			print("error 5d at: " + str(RIP))
 			break
 	elif(command == "7c"):#shl ins
 		if (int(v4[RIP+2:RIP+4], 16) & 3 == 2):
-			print(str(hex(int(RIP / 2))) + " shl var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + ", " + str(int(v4[RIP+4:RIP+6], 16)))
+			print(str(ins) + " " + str(hex(int(RIP / 2))) + " shl var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + ", " + str(int(v4[RIP+4:RIP+6], 16)))
 			RIP += 14
 		else:
 			print("error 7c at: " + str(RIP))
 			break
 	elif(command == "8b"):#xor ins
 		if (int(v4[RIP+2:RIP+4], 16) & 3 == 0):
-			print(str(hex(int(RIP / 2))) + " xor var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + ", var" + str((int(v4[RIP+2:RIP+4], 16) >> 6) & 3) )
+			print(str(ins) + " " + str(hex(int(RIP / 2))) + " xor var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + ", var" + str((int(v4[RIP+2:RIP+4], 16) >> 6) & 3) )
 			RIP += 6
 		elif (int(v4[RIP+2:RIP+4], 16) & 3 == 2):
-			print(str(hex(int(RIP / 2))) + " xor var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + ", " + str(v4[RIP+4:RIP+12]))
+			print(str(ins) + " " + str(hex(int(RIP / 2))) + " xor var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + ", " + str(v4[RIP+4:RIP+12]))
 			RIP += 12
 		else:
 			print("error 8b at: " + str(RIP))
 			break
 	elif(command == "4a"):#add ins
 		if (int(v4[RIP+2:RIP+4], 16) & 3 == 0):
-			print(str(hex(int(RIP / 2))) + " add var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + ", var" + str((int(v4[RIP+2:RIP+4], 16) >> 6) & 3))
+			print(str(ins) + " " + str(hex(int(RIP / 2))) + " add var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + ", var" + str((int(v4[RIP+2:RIP+4], 16) >> 6) & 3))
 			RIP += 4
 		elif (int(v4[RIP+2:RIP+4], 16) & 3 == 2):
-			print(str(hex(int(RIP / 2))) + " add var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + ", " + v4[RIP+4:RIP+12])
+			print(str(ins) + " " + str(hex(int(RIP / 2))) + " add var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + ", " + v4[RIP+4:RIP+12])
 			RIP += 14
 		else:
 			print("error 4a at: " + str(RIP))
 			break
 	elif(command == "1e"):#swappstack
 		if (int(v4[RIP+2:RIP+4], 16) & 3 == 2):
-			print(str(hex(int(RIP / 2))) + " swapstack + 18")
+			print(str(ins) + " " + str(hex(int(RIP / 2))) + " swapstack + 18")
 			RIP += 18
 		elif (int(v4[RIP+2:RIP+4], 16) & 3 == 3):
-			print(str(hex(int(RIP / 2))) + " swapstack + 20")
+			print(str(ins) + " " + str(hex(int(RIP / 2))) + " swapstack + 20")
 			RIP += 20
 		elif (int(v4[RIP+2:RIP+4], 16) & 3 == 1):
-			print(str(hex(int(RIP / 2))) + " swapstack + 16")
+			print(str(ins) + " " + str(hex(int(RIP / 2))) + " swapstack + 16")
 			RIP += 16
 		else:
-			print(str(hex(int(RIP / 2))) + " swapstack + 6")
+			print(str(ins) + " " + str(hex(int(RIP / 2))) + " swapstack + 6")
 			RIP += 6
 	elif(command == "b1"):#shift right
 		if (int(v4[RIP+2:RIP+4], 16) & 3 == 2):
-			print(str(hex(int(RIP / 2))) + " shr var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + ", " + str(int(v4[RIP+4:RIP+6], 16)))
+			print(str(ins) + " " + str(hex(int(RIP / 2))) + " shr var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + ", " + str(int(v4[RIP+4:RIP+6], 16)))
 			RIP += 12
 		else:
 			print("error b1 at: " + str(RIP))
 	elif(command == "d5"):#move the xmmwords
 		if(int(v4[RIP+2:RIP+4], 16) & 3 == 3):
-			print(str(hex(int(RIP / 2))) + " stackxmmswarp + 18")
+			print(str(ins) + " " + str(hex(int(RIP / 2))) + " stackxmmswarp + 18")
 			RIP += 18
 		elif (int(v4[RIP+2:RIP+4], 16) & 3 == 2):
-			print(str(hex(int(RIP / 2))) + " stackxmmswarp + 10")
+			print(str(ins) + " " + str(hex(int(RIP / 2))) + " stackxmmswarp + 10")
 			RIP += 10
 		else:
 			print("error at d5: " + str(RIP))
 			break
 	elif(command == "c3"):#cmp
 		if (int(v4[RIP+2:RIP+4], 16) & 3 == 2):
-			print(str(hex(int(RIP / 2))) + " cmp var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + ", " + v4[RIP+4:RIP+12])
+			print(str(ins) + " " + str(hex(int(RIP / 2))) + " cmp var" + str((int(v4[RIP+2:RIP+4], 16) >> 4) & 3) + ", " + v4[RIP+4:RIP+12])
 			RIP += 14
 		else:
 			print("error c3 at: " + str(RIP))
 	elif(command == "00"):#ret
-		print(str(hex(int(RIP / 2))) + " return")
+		print(str(ins) + " " + str(hex(int(RIP / 2))) + " return")
 		RIP += 4
 	else:
 		print("error command " + command + " at: " + str(RIP))
 		break
+	ins += 1
